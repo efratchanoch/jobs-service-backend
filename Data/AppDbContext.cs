@@ -12,6 +12,8 @@ public class AppDbContext : DbContext
 
     public DbSet<Job> Jobs { get; set; } = null!;
     public DbSet<Tag> Tags { get; set; } = null!;
+    public DbSet<Application> Applications { get; set; } = null!;
+    public DbSet<PrivateJobInvitation> PrivateJobInvitations { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -25,6 +27,22 @@ public class AppDbContext : DbContext
             .HasMany(j => j.Tags)
             .WithMany(t => t.Jobs)
             .UsingEntity(join => join.ToTable("JobTags"));
+
+        modelBuilder.Entity<Application>()
+            .HasIndex(a => new { a.JobId, a.StudentId })
+            .IsUnique();
+
+        modelBuilder.Entity<Application>()
+            .HasOne(a => a.Job)
+            .WithMany()
+            .HasForeignKey(a => a.JobId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<PrivateJobInvitation>()
+            .HasOne(i => i.Job)
+            .WithMany()
+            .HasForeignKey(i => i.JobId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
 
