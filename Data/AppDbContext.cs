@@ -19,6 +19,7 @@ public class AppDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
+modelBuilder.Entity<PrivateJobInvitation>().HasKey(i => i.InvitationId);
         modelBuilder.Entity<Job>()
             .Property(j => j.IsActive)
             .IsRequired();
