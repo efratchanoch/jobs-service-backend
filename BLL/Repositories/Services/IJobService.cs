@@ -1,6 +1,7 @@
-using JobsService.DTOs.Jobs;
+using jobs_service_backend.DTOs.Jobs;
+using jobs_service_backend.DTOs.Common;
 
-namespace JobsService.BLL.Services
+namespace jobs_service_backend.BLL.Repositories.Services
 {
     public interface IJobService
     {
@@ -10,6 +11,5 @@ namespace JobsService.BLL.Services
         Task<JobDto> CreateJobAsync(CreateJobDto dto);
         Task<bool> UpdateJobAsync(int id, UpdateJobDto dto);
         Task<bool> DeleteJobAsync(int id);
-        Task<int> CloseExpiredJobsAsync(); // פונקציה עבור ה-Background Job
     }
 }

@@ -1,4 +1,4 @@
-namespace JobsService.DTOs.Jobs
+namespace jobs_service_backend.DTOs.Jobs
 {
     public class JobDto//להציג את פרטי המשרה
     {

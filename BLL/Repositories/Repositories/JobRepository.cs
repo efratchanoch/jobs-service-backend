@@ -1,9 +1,9 @@
-using JobsService.Data; 
-using JobsService.Data.Entities;
-using JobsService.DTOs.Jobs;
+using jobs_service_backend.Data;
+using jobs_service_backend.Data.Entities;
+using jobs_service_backend.DTOs.Jobs;
 using Microsoft.EntityFrameworkCore;
 
-namespace JobsService.BLL.Repositories
+namespace jobs_service_backend.BLL.Repositories.Repositories
 {
     public class JobRepository : IJobRepository
     {
@@ -17,12 +17,10 @@ namespace JobsService.BLL.Repositories
         public async Task<(IEnumerable<Job> Jobs, int TotalCount)> GetAllPublicJobsAsync(int pageNumber, int pageSize)
         {
             var query = _context.Jobs
-                .Include(j => j.JobTags)
-                    .ThenInclude(jt => jt.Tag) // מביא את השם של התגית
-                .Where(j => j.IsActive && !j.IsPrivate); // פעילות ופומביות בלבד
+                .Include(j => j.Tags) // שימוש ב-Tags הישיר
+                .Where(j => !j.IsPrivate && j.IsActive);
 
             var totalCount = await query.CountAsync();
-            
             var jobs = await query
                 .OrderByDescending(j => j.CreatedAt)
                 .Skip((pageNumber - 1) * pageSize)
@@ -32,96 +30,47 @@ namespace JobsService.BLL.Repositories
             return (jobs, totalCount);
         }
 
-        public async Task<(IEnumerable<Job> Jobs, int TotalCount)> SearchJobsAsync(JobSearchFiltersDto filters)
-        {
-            var query = _context.Jobs
-                .Include(j => j.JobTags)
-                    .ThenInclude(jt => jt.Tag)
-                .Where(j => j.IsActive && !j.IsPrivate)
-                .AsQueryable();
-
-            // סינון דינמי - מוסיפים תנאים רק אם המשתמש שלח אותם
-            if (!string.IsNullOrWhiteSpace(filters.FreeText))
-            {
-                query = query.Where(j => j.Title.Contains(filters.FreeText) || j.Description.Contains(filters.FreeText));
-            }
-
-            if (!string.IsNullOrWhiteSpace(filters.Location))
-            {
-                query = query.Where(j => j.Location.Contains(filters.Location));
-            }
-
-            if (filters.Field.HasValue)
-            {
-                query = query.Where(j => j.Field == filters.Field.Value);
-            }
-
-            if (filters.TagIds != null && filters.TagIds.Any())
-            {
-                // מביא משרות שיש להן לפחות אחת מהתגיות שביקשנו
-                query = query.Where(j => j.JobTags.Any(jt => filters.TagIds.Contains(jt.TagId)));
-            }
-
-            var totalCount = await query.CountAsync();
-
-            var jobs = await query
-                .OrderByDescending(j => j.CreatedAt)
-                .Skip((filters.PageNumber - 1) * filters.PageSize)
-                .Take(filters.PageSize)
-                .ToListAsync();
-
-            return (jobs, totalCount);
-        }
-
         public async Task<Job?> GetJobByIdAsync(int id)
         {
             return await _context.Jobs
-                .Include(j => j.JobTags)
-                    .ThenInclude(jt => jt.Tag)
-                .FirstOrDefaultAsync(j => j.JobId == id && j.IsActive);
+                .Include(j => j.Tags)
+                .FirstOrDefaultAsync(j => j.JobId == id);
         }
 
         public async Task<Job> CreateJobAsync(Job job, List<int> tagIds)
         {
-            // הוספת המשרה למסד
-            await _context.Jobs.AddAsync(job);
-            await _context.SaveChangesAsync(); // שומרים כדי לקבל את ה-JobId שנוצר
-
-            // יצירת קשרי התגיות
             if (tagIds != null && tagIds.Any())
             {
-                var jobTags = tagIds.Select(tagId => new JobTag
-                {
-                    JobId = job.JobId,
-                    TagId = tagId
-                });
-                
-                await _context.JobTags.AddRangeAsync(jobTags);
-                await _context.SaveChangesAsync();
+                var tags = await _context.Tags.Where(t => tagIds.Contains(t.TagId)).ToListAsync();
+                job.Tags = tags; // הוספת הטגיות ישירות לאוסף
             }
 
+            _context.Jobs.Add(job);
+            await _context.SaveChangesAsync();
             return job;
         }
 
         public async Task UpdateJobAsync(Job job, List<int> tagIds)
         {
-            _context.Jobs.Update(job);
+            // טעינת המשרה עם הטגיות הקיימות
+            var existingJob = await _context.Jobs
+                .Include(j => j.Tags)
+                .FirstOrDefaultAsync(j => j.JobId == job.JobId);
 
-            // ניהול תגיות: מוחקים את הישנות ומוסיפים את החדשות (גישה פשוטה ונוחה)
-            var existingTags = await _context.JobTags.Where(jt => jt.JobId == job.JobId).ToListAsync();
-            _context.JobTags.RemoveRange(existingTags);
-
-            if (tagIds != null && tagIds.Any())
+            if (existingJob != null)
             {
-                var newJobTags = tagIds.Select(tagId => new JobTag
+                _context.Entry(existingJob).CurrentValues.SetValues(job);
+                
+                // עדכון הטגיות בקשר Many-to-Many
+                existingJob.Tags.Clear();
+                if (tagIds != null && tagIds.Any())
                 {
-                    JobId = job.JobId,
-                    TagId = tagId
-                });
-                await _context.JobTags.AddRangeAsync(newJobTags);
-            }
+                    var tags = await _context.Tags.Where(t => tagIds.Contains(t.TagId)).ToListAsync();
+                    foreach (var tag in tags) existingJob.Tags.Add(tag);
+                }
 
-            await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync();
+            }
         }
 
         public async Task DeleteJobAsync(int id)
@@ -129,10 +78,41 @@ namespace JobsService.BLL.Repositories
             var job = await _context.Jobs.FindAsync(id);
             if (job != null)
             {
-                // מחיקה רכה - אנחנו לא עושים _context.Jobs.Remove(job)
-                job.IsActive = false;
+                _context.Jobs.Remove(job);
                 await _context.SaveChangesAsync();
             }
         }
+
+public async Task<(IEnumerable<Job> Jobs, int TotalCount)> SearchJobsAsync(JobSearchFiltersDto filters)
+{
+    var query = _context.Jobs.Include(j => j.Tags).AsQueryable();
+
+    // שימוש ב-FreeText כפי שהגדרת ב-DTO
+    if (!string.IsNullOrEmpty(filters.FreeText))
+    {
+        query = query.Where(j => j.Title.Contains(filters.FreeText) 
+                              || j.CompanyName.Contains(filters.FreeText)
+                              || j.Description.Contains(filters.FreeText));
+    }
+
+    // סינון לפי מיקום (ראיתי שיש לך ב-DTO)
+    if (!string.IsNullOrEmpty(filters.Location))
+    {
+        query = query.Where(j => j.Location.Contains(filters.Location));
+    }
+
+    if (filters.Field.HasValue)
+    {
+        query = query.Where(j => j.Field == filters.Field.Value);
+    }
+
+    var totalCount = await query.CountAsync();
+    var jobs = await query
+        .Skip((filters.PageNumber - 1) * filters.PageSize)
+        .Take(filters.PageSize)
+        .ToListAsync();
+
+    return (jobs, totalCount);
+}
     }
 }

@@ -1,4 +1,7 @@
-namespace JobsService.DTOs.Common
+using System;
+using System.Collections.Generic;
+
+namespace jobs_service_backend.DTOs.Common
 {
     public class PaginatedListDto<T>
     {
@@ -6,8 +9,6 @@ namespace JobsService.DTOs.Common
         public int TotalCount { get; set; }
         public int PageNumber { get; set; }
         public int TotalPages { get; set; }
-        public bool HasPreviousPage => PageNumber > 1;
-        public bool HasNextPage => PageNumber < TotalPages;
 
         public PaginatedListDto(IEnumerable<T> items, int count, int pageNumber, int pageSize)
         {

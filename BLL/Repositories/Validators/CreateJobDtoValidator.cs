@@ -1,7 +1,7 @@
 using FluentValidation;
-using JobsService.DTOs.Jobs;
+using jobs_service_backend.DTOs.Jobs;
 
-namespace JobsService.BLL.Validators
+namespace jobs_service_backend.BLL.Validators
 {
     public class CreateJobDtoValidator : AbstractValidator<CreateJobDto>
     {

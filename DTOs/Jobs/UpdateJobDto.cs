@@ -1,6 +1,6 @@
-using JobsService.Data.Enums;
+using jobs_service_backend.Data.Enums;
 
-namespace JobsService.DTOs.Jobs
+namespace jobs_service_backend.DTOs.Jobs
 {
     public class UpdateJobDto
     {

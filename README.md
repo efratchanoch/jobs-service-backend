@@ -34,7 +34,7 @@ Installed NuGet packages (all targeting .NET 8 / EF Core 8):
 ```json
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Server=(localdb)\\\\mssqllocaldb;Database=JobsServiceDb;Trusted_Connection=True;MultipleActiveResultSets=true"
+    "DefaultConnection": "Server=(localdb)\\\\mssqllocaldb;Database=jobs_service_backendDb;Trusted_Connection=True;MultipleActiveResultSets=true"
   }
 }
 ```

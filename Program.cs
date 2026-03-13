@@ -1,11 +1,10 @@
 using jobs_service_backend.Data;
 using Microsoft.EntityFrameworkCore;
-// הוסיפי את ה-usings האלו כדי שהקוד יזהה את השכבות החדשות
-using JobsService.BLL.Repositories;
-using JobsService.BLL.Services;
+using jobs_service_backend.BLL.Repositories.Repositories; 
+using jobs_service_backend.BLL.Repositories.Services;     
 using FluentValidation.AspNetCore;
 using FluentValidation;
-using JobsService.BLL.Validators;
+using jobs_service_backend.BLL.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,18 +13,16 @@ builder.Services.AddControllers();
 
 // --- 2. הגדרת בסיס הנתונים ---
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-                        ?? "Server=(localdb)\\mssqllocaldb;Database=JobsServiceDb;Trusted_Connection=True;MultipleActiveResultSets=true";
+                        ?? "Server=(localdb)\\mssqllocaldb;Database=jobs_service_backendDb;Trusted_Connection=True;MultipleActiveResultSets=true";
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString));
 
-// --- 3. רישום השכבות שלנו (Dependency Injection) ---
-// Scoped אומר שהאובייקט ייווצר מחדש בכל בקשת HTTP
+// --- 3. רישום השכבות (DI) ---
 builder.Services.AddScoped<IJobRepository, JobRepository>();
 builder.Services.AddScoped<IJobService, JobService>();
 
 // --- 4. רישום AutoMapper ---
-// הוא סורק אוטומטית את כל ה-Profiles שהגדרנו ב-BLL
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 // --- 5. רישום FluentValidation ---
@@ -38,16 +35,7 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// --- 7. הרצת ה-Seed (נתונים ראשוניים לבדיקה) ---
-// הוספתי כאן לוגיקה שיוצרת נתונים אם הדאטהבייס ריק
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    var context = services.GetRequiredService<AppDbContext>();
-    // קריאה לפונקציית ה-Seed (ניצור אותה מיד)
-    DbInitializer.Seed(context);
-}
-
+// --- 7. הגדרות הרצה (ללא ה-Seed הבעייתי) ---
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -55,7 +43,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseAuthorization(); // חשוב אם תוסיפי בהמשך אבטחה
+app.UseAuthorization();
 app.MapControllers();
 
 app.Run();

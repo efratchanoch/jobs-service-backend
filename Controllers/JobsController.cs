@@ -1,8 +1,7 @@
-using JobsService.BLL.Services;
-using JobsService.DTOs.Jobs;
+using jobs_service_backend.BLL.Repositories.Services; // הכתובת המעודכנת
+using jobs_service_backend.DTOs.Jobs;
 using Microsoft.AspNetCore.Mvc;
-
-namespace JobsService.Controllers
+namespace jobs_service_backend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

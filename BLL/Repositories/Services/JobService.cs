@@ -1,9 +1,11 @@
 using AutoMapper;
-using JobsService.BLL.Repositories;
-using JobsService.Data.Entities;
-using JobsService.DTOs.Jobs;
+using jobs_service_backend.BLL.Repositories.Repositories;
+using jobs_service_backend.BLL.Repositories.Services;
+using jobs_service_backend.Data.Entities;
+using jobs_service_backend.DTOs.Jobs;
+using jobs_service_backend.DTOs.Common;
 
-namespace JobsService.BLL.Services
+namespace jobs_service_backend.BLL.Repositories.Services
 {
     public class JobService : IJobService
     {
@@ -20,7 +22,6 @@ namespace JobsService.BLL.Services
         {
             var (jobs, totalCount) = await _repository.GetAllPublicJobsAsync(pageNumber, pageSize);
             var dtos = _mapper.Map<IEnumerable<JobDto>>(jobs);
-            
             return new PaginatedListDto<JobDto>(dtos, totalCount, pageNumber, pageSize);
         }
 
@@ -28,7 +29,6 @@ namespace JobsService.BLL.Services
         {
             var (jobs, totalCount) = await _repository.SearchJobsAsync(filters);
             var dtos = _mapper.Map<IEnumerable<JobDto>>(jobs);
-            
             return new PaginatedListDto<JobDto>(dtos, totalCount, filters.PageNumber, filters.PageSize);
         }
 
@@ -49,27 +49,17 @@ namespace JobsService.BLL.Services
         {
             var existingJob = await _repository.GetJobByIdAsync(id);
             if (existingJob == null) return false;
-
-            _mapper.Map(dto, existingJob); // מעדכן את האובייקט הקיים בערכים החדשים
+            _mapper.Map(dto, existingJob);
             await _repository.UpdateJobAsync(existingJob, dto.TagIds);
             return true;
         }
 
         public async Task<bool> DeleteJobAsync(int id)
         {
-            var job = await _repository.GetJobByIdAsync(id);
-            if (job == null) return false;
-
+            var success = await _repository.GetJobByIdAsync(id);
+            if (success == null) return false;
             await _repository.DeleteJobAsync(id);
             return true;
-        }
-
-        public async Task<int> CloseExpiredJobsAsync()
-        {
-            // כאן תבוא לוגיקה שסוגרת משרות שה-Deadline שלהן עבר
-            // זה "הגדלת ראש" - אנחנו מחפשים את כל המשרות הפתוחות שהתאריך שלהן עבר
-            // וקוראים ל-Repository לעדכן אותן ל-Closed
-            return 0; // נחזיר את מספר המשרות שנסגרו
         }
     }
 }
