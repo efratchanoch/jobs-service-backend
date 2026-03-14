@@ -45,15 +45,16 @@ namespace jobs_service_backend.BLL.Repositories.Services
             return _mapper.Map<JobDto>(createdJob);
         }
 
-        public async Task<bool> UpdateJobAsync(int id, UpdateJobDto dto)
-        {
-            var existingJob = await _repository.GetJobByIdAsync(id);
-            if (existingJob == null) return false;
-            _mapper.Map(dto, existingJob);
-            await _repository.UpdateJobAsync(existingJob, dto.TagIds);
-            return true;
-        }
+public async Task<bool> UpdateJobAsync(int id, UpdateJobDto dto)
+{
+    var existingJob = await _repository.GetJobByIdAsync(id);
+    if (existingJob == null) return false;
 
+    _mapper.Map(dto, existingJob);
+    
+    await _repository.UpdateJobAsync(existingJob, dto.TagIds);
+    return true;
+}
         public async Task<bool> DeleteJobAsync(int id)
         {
             var success = await _repository.GetJobByIdAsync(id);
