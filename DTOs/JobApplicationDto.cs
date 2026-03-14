@@ -2,7 +2,7 @@ using jobs_service_backend.Data.Enums;
 
 namespace jobs_service_backend.DTOs;
 
-public class JobApplicationDto
+public class JobApplicationsListDto
 {
     public int ApplicationId { get; set; }
 
