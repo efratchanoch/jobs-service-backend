@@ -15,6 +15,12 @@ namespace jobs_service_backend.BLL.Repositories.Repositories
             _context = context;
         }
 
+        public async Task<bool> IsAlreadyAppliedAsync(int studentId, int jobId)
+        {
+            return await _context.Applications
+                .AnyAsync(a => a.StudentId == studentId && a.JobId == jobId);
+        }
+
         public async Task<IEnumerable<Application>> GetMyApplicationsAsync(int studentId)
         {
             return await _context.Applications
@@ -35,22 +41,10 @@ namespace jobs_service_backend.BLL.Repositories.Repositories
                 .ToListAsync();
         }
 
-        public async Task<Application?> ApplyToJobAsync(CreateApplicationDto dto, int studentId)
+        public async Task<Application> ApplyToJobAsync(Application application)
         {
-            var alreadyApplied = await _context.Applications
-                .AnyAsync(a => a.JobId == dto.JobId && a.StudentId == studentId);
-            if (alreadyApplied)
-                return null;
-
-            var application = new Application
-            {
-                JobId = dto.JobId,
-                StudentId = studentId,
-                CoverLetter = dto.CoverLetter,
-                Status = ApplicationStatus.Pending,
-                AppliedAt = DateTime.UtcNow
-            };
-
+            application.AppliedAt = DateTime.UtcNow;
+            application.Status = ApplicationStatus.Pending;
             _context.Applications.Add(application);
             await _context.SaveChangesAsync();
             return application;
