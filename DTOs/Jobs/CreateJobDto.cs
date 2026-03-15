@@ -6,7 +6,7 @@ namespace jobs_service_backend.DTOs.Jobs
     {
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        public int Experience { get; set; }
+        public string Experience { get; set; } = string.Empty;
         public string Requirements { get; set; } = string.Empty;
         public string CompanyName { get; set; } = string.Empty;
         public string Location { get; set; } = string.Empty;
