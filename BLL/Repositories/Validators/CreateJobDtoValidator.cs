@@ -11,14 +11,9 @@ namespace jobs_service_backend.BLL.Validators
                                  .MaximumLength(100).WithMessage("הכותרת ארוכה מדי.");
             
             RuleFor(x => x.CompanyName).NotEmpty().WithMessage("שם החברה הוא שדה חובה.");
-            
+
             RuleFor(x => x.Experience)
-                .NotEmpty().WithMessage("שנות ניסיון הוא שדה חובה.")
-                .Must(value =>
-                {
-                    if (!int.TryParse(value, out var years)) return false;
-                    return years >= 0;
-                })
+                .GreaterThanOrEqualTo(0)
                 .WithMessage("שנות ניסיון חייב להיות מספר שלם גדול או שווה לאפס.");
             
             RuleFor(x => x.Deadline).GreaterThan(DateTime.UtcNow).WithMessage("תאריך סיום חייב להיות בעתיד.");
