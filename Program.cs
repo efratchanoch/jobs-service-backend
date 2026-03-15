@@ -21,9 +21,11 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // --- 3. רישום השכבות (DI) ---
 builder.Services.AddScoped<IJobRepository, JobRepository>();
 builder.Services.AddScoped<IInvitationRepository, InvitationRepository>();
-builder.Services.AddScoped<IJobService, JobService>();
 builder.Services.AddScoped<IApplicationRepository, ApplicationRepository>();
+
+builder.Services.AddScoped<IJobService, JobService>();
 builder.Services.AddScoped<IApplicationService, ApplicationService>();
+builder.Services.AddScoped<IInvitationService, InvitationService>();
 
 // --- 4. רישום AutoMapper ---
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
