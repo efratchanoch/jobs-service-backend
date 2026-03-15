@@ -1,6 +1,6 @@
 namespace jobs_service_backend.DTOs;
 
-public class UpdateNotesDto
+public class UpdateApplicationNotesDto
 {
     public string? Notes { get; set; }
 }
