@@ -1,6 +1,6 @@
 namespace jobs_service_backend.DTOs.Jobs
 {
-    public class JobDto//להציג את פרטי המשרה
+    public class JobDto
     {
         public int JobId { get; set; }
         public string Title { get; set; } = string.Empty;
