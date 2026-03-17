@@ -1,5 +1,6 @@
 using jobs_service_backend.BLL.Repositories.Services; // הכתובת המעודכנת
 using jobs_service_backend.DTOs.Jobs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 namespace jobs_service_backend.Controllers
 {
@@ -37,7 +38,7 @@ namespace jobs_service_backend.Controllers
         }
 
         [HttpPost]
-        // הרשאה: מנהלת (כאן בהמשך תוסיפי [Authorize(Roles = "Admin")])
+        [Authorize(Roles = "Manager")]
         public async Task<IActionResult> Create([FromBody] CreateJobDto dto)
         {
             var createdJob = await _jobService.CreateJobAsync(dto);
@@ -45,6 +46,7 @@ namespace jobs_service_backend.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Manager")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateJobDto dto)
         {
             var success = await _jobService.UpdateJobAsync(id, dto);
@@ -53,6 +55,7 @@ namespace jobs_service_backend.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Manager")]
         public async Task<IActionResult> Delete(int id)
         {
             var success = await _jobService.DeleteJobAsync(id);

@@ -14,7 +14,6 @@ namespace jobs_service_backend.BLL.Repositories.Repositories
             _context = context;
         }
 
-        // 1. שליפת כל המשרות הציבוריות והפעילות
         public async Task<(IEnumerable<Job> Jobs, int TotalCount)> GetAllPublicJobsAsync(int pageNumber, int pageSize)
         {
             var query = _context.Jobs
@@ -32,7 +31,6 @@ namespace jobs_service_backend.BLL.Repositories.Repositories
             return (jobs, totalCount);
         }
 
-        // 2. חיפוש וסינון מתקדם (כולל תגיות)
         public async Task<(IEnumerable<Job> Jobs, int TotalCount)> SearchJobsAsync(JobSearchFiltersDto filters)
         {
             var query = _context.Jobs
@@ -66,7 +64,6 @@ namespace jobs_service_backend.BLL.Repositories.Repositories
             return (jobs, totalCount);
         }
 
-        // 3. שליפת משרה בודדת
         public async Task<Job?> GetJobByIdAsync(int id)
         {
             return await _context.Jobs
@@ -74,7 +71,6 @@ namespace jobs_service_backend.BLL.Repositories.Repositories
                 .FirstOrDefaultAsync(j => j.JobId == id && j.IsActive);
         }
 
-        // 4. יצירת משרה חדשה עם תגיות
         public async Task<Job> CreateJobAsync(Job job, List<int> tagIds)
         {
             if (tagIds != null && tagIds.Any())
@@ -88,7 +84,6 @@ namespace jobs_service_backend.BLL.Repositories.Repositories
             return job;
         }
 
-        // 5. עדכון משרה (כולל ניקוי ועדכון תגיות מחדש)
         public async Task UpdateJobAsync(Job job, List<int> tagIds)
         {
             var existingJob = await _context.Jobs
@@ -97,10 +92,8 @@ namespace jobs_service_backend.BLL.Repositories.Repositories
 
             if (existingJob != null)
             {
-                // עדכון שדות פשוטים
                 _context.Entry(existingJob).CurrentValues.SetValues(job);
                 
-                // עדכון תגיות: מוחקים את הישנות ומביאים את החדשות מה-DB
                 existingJob.Tags.Clear();
                 if (tagIds != null && tagIds.Any())
                 {
@@ -112,13 +105,12 @@ namespace jobs_service_backend.BLL.Repositories.Repositories
             }
         }
 
-        // 6. מחיקה רכה (Soft Delete)
         public async Task DeleteJobAsync(int id)
         {
             var job = await _context.Jobs.FindAsync(id);
             if (job != null)
             {
-                job.IsActive = false; // לא באמת מוחקים! רק מכבים
+                job.IsActive = false; 
                 await _context.SaveChangesAsync();
             }
         }

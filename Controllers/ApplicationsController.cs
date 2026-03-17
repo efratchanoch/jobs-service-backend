@@ -1,5 +1,5 @@
-using System.Security.Claims;
 using jobs_service_backend.BLL.Repositories.Services;
+using jobs_service_backend.BLL.Services;
 using jobs_service_backend.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,12 +12,12 @@ namespace jobs_service_backend.Controllers
     public class ApplicationsController : ControllerBase
     {
         private readonly IApplicationService _applicationService;
+        private readonly IIdentityService _identityService;
 
-        private const string StudentIdClaimType = "StudentId";
-
-        public ApplicationsController(IApplicationService applicationService)
+        public ApplicationsController(IApplicationService applicationService, IIdentityService identityService)
         {
             _applicationService = applicationService;
+            _identityService = identityService;
         }
 
         /// <summary>
@@ -26,13 +26,10 @@ namespace jobs_service_backend.Controllers
         [HttpGet("my")]
         public async Task<IActionResult> GetMyApplications()
         {
-            var studentId = GetStudentIdFromClaims();
-            if (studentId == null)
-                return Unauthorized("מזהה תלמידה לא זמין.");
-
             try
             {
-                var result = await _applicationService.GetMyApplicationsAsync(studentId.Value);
+                var studentId = _identityService.GetStudentId(User);
+                var result = await _applicationService.GetMyApplicationsAsync(studentId);
                 return Ok(result);
             }
             catch (InvalidOperationException ex)
@@ -47,13 +44,10 @@ namespace jobs_service_backend.Controllers
         [HttpPost]
         public async Task<IActionResult> ApplyToJob([FromBody] CreateApplicationDto dto)
         {
-            var studentId = GetStudentIdFromClaims();
-            if (studentId == null)
-                return Unauthorized("מזהה תלמידה לא זמין.");
-
             try
             {
-                var result = await _applicationService.ApplyToJobAsync(dto, studentId.Value);
+                var studentId = _identityService.GetStudentId(User);
+                var result = await _applicationService.ApplyToJobAsync(dto, studentId);
                 return CreatedAtAction(nameof(GetMyApplications), null, result);
             }
             catch (InvalidOperationException ex)
@@ -120,12 +114,5 @@ namespace jobs_service_backend.Controllers
             }
         }
 
-        private int? GetStudentIdFromClaims()
-        {
-            var value = User.FindFirstValue(StudentIdClaimType)
-                        ?? User.FindFirstValue(ClaimTypes.NameIdentifier)
-                        ?? User.FindFirstValue("sub");
-            return int.TryParse(value, out var id) ? id : null;
-        }
     }
 }

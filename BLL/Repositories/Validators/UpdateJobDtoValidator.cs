@@ -8,23 +8,22 @@ namespace jobs_service_backend.BLL.Validators
         public UpdateJobDtoValidator()
         {
             RuleFor(x => x.Title)
-                .NotEmpty().WithMessage("כותרת המשרה היא שדה חובה.")
-                .MaximumLength(100).WithMessage("הכותרת ארוכה מדי.");
+                .NotEmpty().WithMessage("Job title is required.")
+                .MaximumLength(100).WithMessage("Title is too long.");
 
             RuleFor(x => x.Experience)
-                .NotEmpty().WithMessage("שנות ניסיון הוא שדה חובה.")
+                .NotEmpty().WithMessage("Years of experience is required.")
                 .Must(value =>
                 {
                     if (!int.TryParse(value, out var years)) return false;
                     return years >= 0;
                 })
-                .WithMessage("שנות ניסיון חייב להיות מספר שלם גדול או שווה לאפס.");
+                .WithMessage("Experience must be a non-negative integer.");
 
             RuleFor(x => x.Deadline)
                 .GreaterThan(DateTime.UtcNow)
                 .When(x => x.Deadline.HasValue)
-                .WithMessage("תאריך סיום חייב להיות בעתיד.");
+                .WithMessage("Deadline must be in the future.");
         }
     }
 }
-

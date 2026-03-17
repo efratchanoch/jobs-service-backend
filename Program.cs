@@ -2,23 +2,25 @@ using jobs_service_backend.Data;
 using Microsoft.EntityFrameworkCore;
 using jobs_service_backend.BLL.Repositories.Repositories; 
 using jobs_service_backend.BLL.Repositories.Services;     
+using jobs_service_backend.BLL.Services;
 using FluentValidation.AspNetCore;
 using FluentValidation;
 using jobs_service_backend.BLL.Validators;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// --- 1. רישום קונטרולרים ---
 builder.Services.AddControllers();
 
-// --- 2. הגדרת בסיס הנתונים ---
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
                         ?? "Server=(localdb)\\mssqllocaldb;Database=jobs_service_backendDb;Trusted_Connection=True;MultipleActiveResultSets=true";
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString));
 
-// --- 3. רישום השכבות (DI) ---
 builder.Services.AddScoped<IJobRepository, JobRepository>();
 builder.Services.AddScoped<IInvitationRepository, InvitationRepository>();
 builder.Services.AddScoped<IApplicationRepository, ApplicationRepository>();
@@ -27,20 +29,74 @@ builder.Services.AddScoped<IJobService, JobService>();
 builder.Services.AddScoped<IApplicationService, ApplicationService>();
 builder.Services.AddScoped<IInvitationService, InvitationService>();
 
-// --- 4. רישום AutoMapper ---
+builder.Services.AddScoped<IIdentityService, IdentityService>();
+
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-// --- 5. רישום FluentValidation ---
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateJobDtoValidator>();
 
-// --- 6. Swagger ---
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        var jwtSection = builder.Configuration.GetSection("Jwt");
+        var key = jwtSection["Key"];
+        var issuer = jwtSection["Issuer"];
+        var audience = jwtSection["Audience"];
+
+        if (string.IsNullOrWhiteSpace(key))
+            throw new InvalidOperationException("JWT Key is missing. Please configure Jwt:Key in appsettings.json.");
+
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
+            ValidateIssuer = !string.IsNullOrWhiteSpace(issuer),
+            ValidIssuer = issuer,
+            ValidateAudience = !string.IsNullOrWhiteSpace(audience),
+            ValidAudience = audience,
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.FromMinutes(2),
+            NameClaimType = System.Security.Claims.ClaimTypes.NameIdentifier,
+            RoleClaimType = System.Security.Claims.ClaimTypes.Role
+        };
+    });
+
+builder.Services.AddAuthorization();
+
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Jobs Service API", Version = "v1" });
+
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Enter: Bearer {your JWT token}"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 
 var app = builder.Build();
 
-// --- 7. הגדרות הרצה (ללא ה-Seed הבעייתי) ---
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -48,6 +104,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "jobs_service_backend.Api", "jobs_service_backend.Api\jobs_service_backend.Api.csproj", "{22A7E50D-3C20-47E4-B0DA-D6D7551FA706}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "jobs_service_backend.Api", "jobs_service_backend.Api.csproj", "{22A7E50D-3C20-47E4-B0DA-D6D7551FA706}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
