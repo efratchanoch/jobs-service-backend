@@ -17,8 +17,6 @@ namespace jobs_service_backend.DTOs.Jobs
         public int? SalaryMin { get; set; }
         public int? SalaryMax { get; set; }
         public DateTime Deadline { get; set; }
-        
-        // אנחנו מבקשים מהקליינט לשלוח רק את ה-IDs של התגיות שהוא רוצה לקשר
         public List<int> TagIds { get; set; } = new(); 
     }
 }

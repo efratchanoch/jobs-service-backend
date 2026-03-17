@@ -14,6 +14,9 @@ public class Job
     public int Experience { get; set; } = 0;
     public string Requirements { get; set; } = string.Empty;
 
+    public string? JobWebsiteUrl { get; set; }
+    public string? ImageUrl { get; set; }
+
     public bool IsRemote { get; set; }
     public bool IsPrivate { get; set; }
 
