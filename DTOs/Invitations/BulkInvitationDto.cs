@@ -5,6 +5,7 @@ namespace jobs_service_backend.DTOs.Invitations
     /// <summary>
     /// DTO לשליחת הזמנה מרובה למשרה על ידי המנהלת.
     /// </summary>
+    
     public class BulkInvitationDto
     {
         [Required(ErrorMessage = "Job ID is required.")]

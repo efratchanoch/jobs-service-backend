@@ -12,12 +12,7 @@ namespace jobs_service_backend.BLL.Validators
                 .MaximumLength(100).WithMessage("Title is too long.");
 
             RuleFor(x => x.Experience)
-                .NotEmpty().WithMessage("Years of experience is required.")
-                .Must(value =>
-                {
-                    if (!int.TryParse(value, out var years)) return false;
-                    return years >= 0;
-                })
+                .GreaterThanOrEqualTo(0)
                 .WithMessage("Experience must be a non-negative integer.");
 
             RuleFor(x => x.Deadline)

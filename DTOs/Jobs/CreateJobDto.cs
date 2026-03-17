@@ -6,7 +6,7 @@ namespace jobs_service_backend.DTOs.Jobs
     {
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        public string Experience { get; set; } = string.Empty;
+        public int Experience { get; set; }
         public string Requirements { get; set; } = string.Empty;
         public string CompanyName { get; set; } = string.Empty;
         public string Location { get; set; } = string.Empty;
@@ -17,8 +17,6 @@ namespace jobs_service_backend.DTOs.Jobs
         public int? SalaryMin { get; set; }
         public int? SalaryMax { get; set; }
         public DateTime Deadline { get; set; }
-        
-        // אנחנו מבקשים מהקליינט לשלוח רק את ה-IDs של התגיות שהוא רוצה לקשר
         public List<int> TagIds { get; set; } = new(); 
     }
 }
