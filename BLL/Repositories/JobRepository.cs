@@ -14,55 +14,60 @@ namespace jobs_service_backend.BLL.Repositories.Repositories
             _context = context;
         }
 
-        public async Task<(IEnumerable<Job> Jobs, int TotalCount)> GetAllPublicJobsAsync(int pageNumber, int pageSize)
-        {
-            var query = _context.Jobs
-                .AsNoTracking()
-                .Include(j => j.Tags)
-                .Where(j => !j.IsPrivate && j.IsActive);
+        public async Task<(IEnumerable<Job> Jobs, int TotalCount)> GetAllPublicJobsAsync(List<JobStatus>? statuses, int pageNumber, int pageSize)
+{
+    var query = _context.Jobs
+        .AsNoTracking()
+        .Include(j => j.Tags)
+        .Where(j => !j.IsPrivate && j.IsActive);
 
-            var totalCount = await query.CountAsync();
-            var jobs = await query
-                .OrderByDescending(j => j.CreatedAt)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+    if (statuses != null && statuses.Count > 0)
+        query = query.Where(j => statuses.Contains(j.Status));
 
-            return (jobs, totalCount);
-        }
+    var totalCount = await query.CountAsync();
+    var jobs = await query
+        .OrderByDescending(j => j.CreatedAt)
+        .Skip((pageNumber - 1) * pageSize)
+        .Take(pageSize)
+        .ToListAsync();
 
-        public async Task<(IEnumerable<Job> Jobs, int TotalCount)> SearchJobsAsync(JobSearchFiltersDto filters)
-        {
-            var query = _context.Jobs
-                .AsNoTracking()
-                .Include(j => j.Tags)
-                .Where(j => j.IsActive)
-                .AsQueryable();
+    return (jobs, totalCount);
+}
 
-            if (!string.IsNullOrEmpty(filters.FreeText))
-            {
-                query = query.Where(j => j.Title.Contains(filters.FreeText) 
-                                      || j.CompanyName.Contains(filters.FreeText)
-                                      || j.Description.Contains(filters.FreeText));
-            }
+public async Task<(IEnumerable<Job> Jobs, int TotalCount)> SearchJobsAsync(JobSearchFiltersDto filters)
+{
+    var query = _context.Jobs
+        .AsNoTracking()
+        .Include(j => j.Tags)
+        .Where(j => j.IsActive)
+        .AsQueryable();
 
-            if (!string.IsNullOrEmpty(filters.Location))
-                query = query.Where(j => j.Location.Contains(filters.Location));
+    if (!string.IsNullOrEmpty(filters.FreeText))
+        query = query.Where(j => j.Title.Contains(filters.FreeText)
+                              || j.CompanyName.Contains(filters.FreeText)
+                              || j.Description.Contains(filters.FreeText));
 
-            if (filters.Field.HasValue)
-                query = query.Where(j => j.Field == filters.Field.Value);
+    if (!string.IsNullOrEmpty(filters.Location))
+        query = query.Where(j => j.Location.Contains(filters.Location));
 
-            if (filters.TagIds != null && filters.TagIds.Any())
-                query = query.Where(j => j.Tags.Any(t => filters.TagIds.Contains(t.TagId)));
+    if (filters.Field.HasValue)
+        query = query.Where(j => j.Field == filters.Field.Value);
 
-            var totalCount = await query.CountAsync();
-            var jobs = await query
-                .Skip((filters.PageNumber - 1) * filters.PageSize)
-                .Take(filters.PageSize)
-                .ToListAsync();
+    if (filters.TagIds != null && filters.TagIds.Any())
+        query = query.Where(j => j.Tags.Any(t => filters.TagIds.Contains(t.TagId)));
 
-            return (jobs, totalCount);
-        }
+    if (filters.Statuses != null && filters.Statuses.Count > 0)
+        query = query.Where(j => filters.Statuses.Contains(j.Status));
+
+    var totalCount = await query.CountAsync();
+    var jobs = await query
+        .Skip((filters.PageNumber - 1) * filters.PageSize)
+        .Take(filters.PageSize)
+        .ToListAsync();
+
+    return (jobs, totalCount);
+}
+
 
         public async Task<Job?> GetJobByIdAsync(int id)
         {
