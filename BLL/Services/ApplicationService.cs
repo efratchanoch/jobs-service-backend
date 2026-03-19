@@ -19,19 +19,21 @@ namespace jobs_service_backend.BLL.Repositories.Services
             _mapper = mapper;
         }
 
-        public async Task<PaginatedListDto<StudentApplicationsListDto>> GetMyApplicationsAsync(int studentId, int pageNumber, int pageSize)
-        {
-            var (applications, totalCount) = await _repository.GetMyApplicationsAsync(studentId, pageNumber, pageSize);
-            var dtos = _mapper.Map<IEnumerable<StudentApplicationsListDto>>(applications);
-            return new PaginatedListDto<StudentApplicationsListDto>(dtos, totalCount, pageNumber, pageSize);
-        }
+        public async Task<PaginatedListDto<StudentApplicationsListDto>> GetMyApplicationsAsync(int studentId, List<ApplicationStatus>? statuses, bool newestFirst, int pageNumber, int pageSize)
+{
+    var (applications, totalCount) = await _repository.GetMyApplicationsAsync(studentId, statuses, newestFirst, pageNumber, pageSize);
+    var dtos = _mapper.Map<IEnumerable<StudentApplicationsListDto>>(applications);
+    return new PaginatedListDto<StudentApplicationsListDto>(dtos, totalCount, pageNumber, pageSize);
+}
 
-        public async Task<PaginatedListDto<JobApplicationsListDto>> GetApplicationsForJobAsync(int jobId, int pageNumber, int pageSize)
-        {
-            var (applications, totalCount) = await _repository.GetApplicationsForJobAsync(jobId, pageNumber, pageSize);
-            var dtos = _mapper.Map<IEnumerable<JobApplicationsListDto>>(applications);
-            return new PaginatedListDto<JobApplicationsListDto>(dtos, totalCount, pageNumber, pageSize);
-        }
+public async Task<PaginatedListDto<JobApplicationsListDto>> GetApplicationsForJobAsync(int jobId, List<ApplicationStatus>? statuses, bool newestFirst, int pageNumber, int pageSize)
+{
+    var (applications, totalCount) = await _repository.GetApplicationsForJobAsync(jobId, statuses, newestFirst, pageNumber, pageSize);
+    var dtos = _mapper.Map<IEnumerable<JobApplicationsListDto>>(applications);
+    return new PaginatedListDto<JobApplicationsListDto>(dtos, totalCount, pageNumber, pageSize);
+}
+
+
 
         public async Task<StudentApplicationsListDto> ApplyToJobAsync(CreateApplicationDto dto, int studentId)
         {

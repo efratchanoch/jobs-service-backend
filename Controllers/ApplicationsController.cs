@@ -20,16 +20,18 @@ namespace jobs_service_backend.Controllers
             _identityService = identityService;
         }
 
+
         [HttpGet("my")]
 public async Task<IActionResult> GetMyApplications(
     [FromQuery] List<ApplicationStatus>? statuses = null,
+    [FromQuery] bool newestFirst = true,
     [FromQuery] int pageNumber = 1,
     [FromQuery] int pageSize = 10)
 {
     try
     {
         var studentId = _identityService.GetStudentId(User);
-        var result = await _applicationService.GetMyApplicationsAsync(studentId, statuses, pageNumber, pageSize);
+        var result = await _applicationService.GetMyApplicationsAsync(studentId, statuses, newestFirst, pageNumber, pageSize);
         return Ok(result);
     }
     catch (InvalidOperationException ex)
@@ -43,12 +45,13 @@ public async Task<IActionResult> GetMyApplications(
 public async Task<IActionResult> GetApplicationsForJob(
     int jobId,
     [FromQuery] List<ApplicationStatus>? statuses = null,
+    [FromQuery] bool newestFirst = true,
     [FromQuery] int pageNumber = 1,
     [FromQuery] int pageSize = 10)
 {
     try
     {
-        var result = await _applicationService.GetApplicationsForJobAsync(jobId, statuses, pageNumber, pageSize);
+        var result = await _applicationService.GetApplicationsForJobAsync(jobId, statuses, newestFirst, pageNumber, pageSize);
         return Ok(result);
     }
     catch (InvalidOperationException ex)
@@ -56,6 +59,7 @@ public async Task<IActionResult> GetApplicationsForJob(
         return BadRequest(ex.Message);
     }
 }
+
 
         /// <summary>
         /// הגשת מועמדות למשרה (studentId מה-Claims, לא מה-body).

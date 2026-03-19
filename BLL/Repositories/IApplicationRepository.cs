@@ -7,8 +7,8 @@ namespace jobs_service_backend.BLL.Repositories.Repositories
 {
     public interface IApplicationRepository
     {
-        Task<(IEnumerable<Application> Applications, int TotalCount)> GetMyApplicationsAsync(int studentId, List<ApplicationStatus>? statuses, int pageNumber, int pageSize); // statuses נוסף
-        Task<(IEnumerable<Application> Applications, int TotalCount)> GetApplicationsForJobAsync(int jobId, List<ApplicationStatus>? statuses, int pageNumber, int pageSize); // statuses נוסף
+        Task<(IEnumerable<Application> Applications, int TotalCount)> GetMyApplicationsAsync(int studentId, List<ApplicationStatus>? statuses, bool newestFirst, int pageNumber, int pageSize);
+        Task<(IEnumerable<Application> Applications, int TotalCount)> GetApplicationsForJobAsync(int jobId, List<ApplicationStatus>? statuses, bool newestFirst, int pageNumber, int pageSize);
         Task<bool> IsAlreadyAppliedAsync(int studentId, int jobId);
         Task<Application> ApplyToJobAsync(Application application);
         Task<bool> UpdateApplicationStatusAsync(UpdateApplicationStatusDto dto);

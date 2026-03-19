@@ -14,7 +14,8 @@ namespace jobs_service_backend.BLL.Repositories.Repositories
             _context = context;
         }
 
-        public async Task<(IEnumerable<Job> Jobs, int TotalCount)> GetAllPublicJobsAsync(List<JobStatus>? statuses, int pageNumber, int pageSize)
+        
+public async Task<(IEnumerable<Job> Jobs, int TotalCount)> GetAllPublicJobsAsync(List<JobStatus>? statuses, bool newestFirst, int pageNumber, int pageSize)
 {
     var query = _context.Jobs
         .AsNoTracking()
@@ -24,9 +25,12 @@ namespace jobs_service_backend.BLL.Repositories.Repositories
     if (statuses != null && statuses.Count > 0)
         query = query.Where(j => statuses.Contains(j.Status));
 
+    query = newestFirst
+        ? query.OrderByDescending(j => j.CreatedAt)
+        : query.OrderBy(j => j.CreatedAt);
+
     var totalCount = await query.CountAsync();
     var jobs = await query
-        .OrderByDescending(j => j.CreatedAt)
         .Skip((pageNumber - 1) * pageSize)
         .Take(pageSize)
         .ToListAsync();
@@ -59,6 +63,10 @@ public async Task<(IEnumerable<Job> Jobs, int TotalCount)> SearchJobsAsync(JobSe
     if (filters.Statuses != null && filters.Statuses.Count > 0)
         query = query.Where(j => filters.Statuses.Contains(j.Status));
 
+    query = filters.NewestFirst
+        ? query.OrderByDescending(j => j.CreatedAt)
+        : query.OrderBy(j => j.CreatedAt);
+
     var totalCount = await query.CountAsync();
     var jobs = await query
         .Skip((filters.PageNumber - 1) * filters.PageSize)
@@ -67,7 +75,6 @@ public async Task<(IEnumerable<Job> Jobs, int TotalCount)> SearchJobsAsync(JobSe
 
     return (jobs, totalCount);
 }
-
 
         public async Task<Job?> GetJobByIdAsync(int id)
         {
