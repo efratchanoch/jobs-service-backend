@@ -2,6 +2,7 @@ using jobs_service_backend.BLL.Repositories.Services; // הכתובת המעוד
 using jobs_service_backend.DTOs.Jobs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using jobs_service_backend.Data.Enums;
 namespace jobs_service_backend.Controllers
 {
     [ApiController]
@@ -16,18 +17,21 @@ namespace jobs_service_backend.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
-        {
-            var result = await _jobService.GetAllPublicJobsAsync(pageNumber, pageSize);
-            return Ok(result);
-        }
+public async Task<IActionResult> GetAll(
+    [FromQuery] List<JobStatus>? statuses = null,
+    [FromQuery] int pageNumber = 1,
+    [FromQuery] int pageSize = 10)
+{
+    var result = await _jobService.GetAllPublicJobsAsync(statuses, pageNumber, pageSize);
+    return Ok(result);
+}
 
-        [HttpGet("search")]
-        public async Task<IActionResult> Search([FromQuery] JobSearchFiltersDto filters)
-        {
-            var result = await _jobService.SearchJobsAsync(filters);
-            return Ok(result);
-        }
+[HttpGet("search")]
+public async Task<IActionResult> Search([FromQuery] JobSearchFiltersDto filters)
+{
+    var result = await _jobService.SearchJobsAsync(filters);
+    return Ok(result);
+}
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)

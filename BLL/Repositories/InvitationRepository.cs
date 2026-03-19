@@ -27,14 +27,21 @@ namespace jobs_service_backend.BLL.Repositories.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<PrivateJobInvitation>> GetMyInvitationsAsync(int studentId)
+        public async Task<(IEnumerable<PrivateJobInvitation> Invitations, int TotalCount)> GetMyInvitationsAsync(int studentId, int pageNumber, int pageSize)
         {
-            return await _context.PrivateJobInvitations
+            var query = _context.PrivateJobInvitations
                 .AsNoTracking()
                 .Include(i => i.Job)
                 .Where(i => i.StudentId == studentId)
-                .OrderByDescending(i => i.InvitedAt)
+                .OrderByDescending(i => i.InvitedAt);
+
+            var totalCount = await query.CountAsync();
+            var invitations = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
+
+            return (invitations, totalCount);
         }
 
         public async Task MarkInvitationViewedAsync(int invitationId)

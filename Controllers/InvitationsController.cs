@@ -33,11 +33,11 @@ namespace jobs_service_backend.Controllers
 
         // 2. שליפת ההזמנות שלי – לפי סטודנטית מתוך ה-JWT
         [HttpGet("my")]
-        public async Task<IActionResult> GetMyInvitations()
+        public async Task<IActionResult> GetMyInvitations([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             var studentId = _identityService.GetStudentId(User);
-            var invitations = await _invitationService.GetMyInvitationsAsync(studentId);
-            return Ok(invitations);
+            var result = await _invitationService.GetMyInvitationsAsync(studentId, pageNumber, pageSize);
+            return Ok(result);
         }
 
         // 3. סימון הזמנה כנצפתה

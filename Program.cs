@@ -97,26 +97,15 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-<<<<<<< Updated upstream
-if (app.Environment.IsDevelopment())
-{
-=======
 // --- 7. הגדרות הרצה (ללא ה-Seed הבעייתי) ---
 
 // if (app.Environment.IsDevelopment())
 // {
->>>>>>> Stashed changes
     app.UseSwagger();
     app.UseSwaggerUI();
 // }
 
-<<<<<<< Updated upstream
-app.UseHttpsRedirection();
-
-app.UseAuthentication();
-=======
 //app.UseHttpsRedirection();
->>>>>>> Stashed changes
 app.UseAuthorization();
 app.MapControllers();
 

@@ -20,23 +20,42 @@ namespace jobs_service_backend.Controllers
             _identityService = identityService;
         }
 
-        /// <summary>
-        /// שליפת כל המועמדויות של התלמידה המחוברת (studentId מה-Claims).
-        /// </summary>
         [HttpGet("my")]
-        public async Task<IActionResult> GetMyApplications()
-        {
-            try
-            {
-                var studentId = _identityService.GetStudentId(User);
-                var result = await _applicationService.GetMyApplicationsAsync(studentId);
-                return Ok(result);
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
+public async Task<IActionResult> GetMyApplications(
+    [FromQuery] List<ApplicationStatus>? statuses = null,
+    [FromQuery] int pageNumber = 1,
+    [FromQuery] int pageSize = 10)
+{
+    try
+    {
+        var studentId = _identityService.GetStudentId(User);
+        var result = await _applicationService.GetMyApplicationsAsync(studentId, statuses, pageNumber, pageSize);
+        return Ok(result);
+    }
+    catch (InvalidOperationException ex)
+    {
+        return BadRequest(ex.Message);
+    }
+}
+
+[HttpGet("job/{jobId:int}")]
+[Authorize(Roles = "Manager")]
+public async Task<IActionResult> GetApplicationsForJob(
+    int jobId,
+    [FromQuery] List<ApplicationStatus>? statuses = null,
+    [FromQuery] int pageNumber = 1,
+    [FromQuery] int pageSize = 10)
+{
+    try
+    {
+        var result = await _applicationService.GetApplicationsForJobAsync(jobId, statuses, pageNumber, pageSize);
+        return Ok(result);
+    }
+    catch (InvalidOperationException ex)
+    {
+        return BadRequest(ex.Message);
+    }
+}
 
         /// <summary>
         /// הגשת מועמדות למשרה (studentId מה-Claims, לא מה-body).
@@ -56,23 +75,6 @@ namespace jobs_service_backend.Controllers
             }
         }
 
-        /// <summary>
-        /// שליפת כל המועמדויות למשרה מסוימת – למנהלת בלבד.
-        /// </summary>
-        [HttpGet("job/{jobId:int}")]
-        [Authorize(Roles = "Manager")]
-        public async Task<IActionResult> GetApplicationsForJob(int jobId)
-        {
-            try
-            {
-                var result = await _applicationService.GetApplicationsForJobAsync(jobId);
-                return Ok(result);
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
 
         /// <summary>
         /// עדכון סטטוס מועמדות – למנהלת בלבד.

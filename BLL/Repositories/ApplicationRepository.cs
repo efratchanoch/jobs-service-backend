@@ -21,24 +21,38 @@ namespace jobs_service_backend.BLL.Repositories.Repositories
                 .AnyAsync(a => a.StudentId == studentId && a.JobId == jobId);
         }
 
-        public async Task<IEnumerable<Application>> GetMyApplicationsAsync(int studentId)
+        public async Task<(IEnumerable<Application> Applications, int TotalCount)> GetMyApplicationsAsync(int studentId, int pageNumber, int pageSize)
         {
-            return await _context.Applications
+            var query = _context.Applications
                 .AsNoTracking()
                 .Include(a => a.Job)
                 .Where(a => a.StudentId == studentId)
-                .OrderByDescending(a => a.AppliedAt)
+                .OrderByDescending(a => a.AppliedAt);
+
+            var totalCount = await query.CountAsync();
+            var applications = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
+
+            return (applications, totalCount);
         }
 
-        public async Task<IEnumerable<Application>> GetApplicationsForJobAsync(int jobId)
+        public async Task<(IEnumerable<Application> Applications, int TotalCount)> GetApplicationsForJobAsync(int jobId, int pageNumber, int pageSize)
         {
-            return await _context.Applications
+            var query = _context.Applications
                 .AsNoTracking()
                 .Include(a => a.Job)
                 .Where(a => a.JobId == jobId)
-                .OrderByDescending(a => a.UpdatedAt ?? a.AppliedAt)
+                .OrderByDescending(a => a.UpdatedAt ?? a.AppliedAt);
+
+            var totalCount = await query.CountAsync();
+            var applications = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
+
+            return (applications, totalCount);
         }
 
         public async Task<Application> ApplyToJobAsync(Application application)

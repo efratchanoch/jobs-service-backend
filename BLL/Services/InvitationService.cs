@@ -1,5 +1,6 @@
 using AutoMapper;
 using jobs_service_backend.BLL.Repositories.Repositories;
+using jobs_service_backend.DTOs.Common;
 using jobs_service_backend.DTOs.Invitations;
 
 namespace jobs_service_backend.BLL.Repositories.Services
@@ -22,10 +23,11 @@ namespace jobs_service_backend.BLL.Repositories.Services
             // TODO: send email notifications to invited students
         }
 
-        public async Task<IEnumerable<InvitationDto>> GetMyInvitationsAsync(int studentId)
+        public async Task<PaginatedListDto<InvitationDto>> GetMyInvitationsAsync(int studentId, int pageNumber, int pageSize)
         {
-            var invitations = await _repository.GetMyInvitationsAsync(studentId);
-            return _mapper.Map<IEnumerable<InvitationDto>>(invitations);
+            var (invitations, totalCount) = await _repository.GetMyInvitationsAsync(studentId, pageNumber, pageSize);
+            var dtos = _mapper.Map<IEnumerable<InvitationDto>>(invitations);
+            return new PaginatedListDto<InvitationDto>(dtos, totalCount, pageNumber, pageSize);
         }
 
         public async Task MarkInvitationViewedAsync(int invitationId)
