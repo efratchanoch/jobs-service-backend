@@ -6,7 +6,7 @@ namespace jobs_service_backend.BLL.Repositories.Services
 {
     public interface IJobService
     {
-        Task<PaginatedListDto<JobDto>> GetAllPublicJobsAsync(List<JobStatus>? statuses, int pageNumber, int pageSize);
+        Task<PaginatedListDto<JobDto>> GetAllPublicJobsAsync(List<JobStatus>? statuses, bool newestFirst, int pageNumber, int pageSize);
         Task<PaginatedListDto<JobDto>> SearchJobsAsync(JobSearchFiltersDto filters);
         Task<JobDto?> GetJobByIdAsync(int id);
         Task<JobDto> CreateJobAsync(CreateJobDto dto);

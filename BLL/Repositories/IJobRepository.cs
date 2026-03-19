@@ -6,7 +6,7 @@ namespace jobs_service_backend.BLL.Repositories.Repositories
 {
     public interface IJobRepository
     {
-        Task<(IEnumerable<Job> Jobs, int TotalCount)> GetAllPublicJobsAsync(List<JobStatus>? statuses, int pageNumber, int pageSize);
+        Task<(IEnumerable<Job> Jobs, int TotalCount)> GetAllPublicJobsAsync(List<JobStatus>? statuses, bool newestFirst, int pageNumber, int pageSize);
         Task<(IEnumerable<Job> Jobs, int TotalCount)> SearchJobsAsync(JobSearchFiltersDto filters);
         Task<Job?> GetJobByIdAsync(int id);
         Task<Job> CreateJobAsync(Job job, List<int> tagIds);

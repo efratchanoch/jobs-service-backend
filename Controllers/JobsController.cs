@@ -16,6 +16,25 @@ namespace jobs_service_backend.Controllers
             _jobService = jobService;
         }
 
+        // ---------------
+        [HttpGet]
+public async Task<IActionResult> GetAll(
+    [FromQuery] List<JobStatus>? statuses = null,
+    [FromQuery] bool newestFirst = true,
+    [FromQuery] int pageNumber = 1,
+    [FromQuery] int pageSize = 10)
+{
+    var result = await _jobService.GetAllPublicJobsAsync(statuses, newestFirst, pageNumber, pageSize);
+    return Ok(result);
+}
+
+[HttpGet("search")]
+public async Task<IActionResult> Search([FromQuery] JobSearchFiltersDto filters)
+{
+    var result = await _jobService.SearchJobsAsync(filters);
+    return Ok(result);
+}
+
         [HttpGet]
 public async Task<IActionResult> GetAll(
     [FromQuery] List<JobStatus>? statuses = null,
