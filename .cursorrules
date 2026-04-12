@@ -1,0 +1,7 @@
+# Core Rules
+- **Language**: English only for code, comments (XML tags), and documentation.
+- **Architecture**: Repository Pattern + Service Layer logic. Controllers handle ONLY HTTP (Routing, DTOs, Status Codes).
+- **Data**: NEVER expose Entities. Use DTOs for all API inputs/outputs.
+- **Clean Code**: Descriptive names; private fields start with `_`; use LINQ where readable.
+- **Error Handling**: Use specific HTTP codes (400, 404, etc.) and consistent error responses. No sensitive leaks.
+- **Performance**: Async/Await everywhere, pagination for lists, avoid N+1.
