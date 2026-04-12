@@ -39,13 +39,13 @@ public async Task<PaginatedListDto<JobApplicationsListDto>> GetApplicationsForJo
         public async Task<StudentApplicationsListDto> ApplyToJobAsync(CreateApplicationDto dto, int studentId)
         {
             if (await _repository.IsAlreadyAppliedAsync(studentId, dto.JobId))
-                throw new InvalidOperationException("התלמידה כבר הגישה מועמדות למשרה זו.");
+                throw new InvalidOperationException("You have already applied to this job.");
 
             var job = await _jobRepository.GetJobByIdAsync(dto.JobId);
             if (job == null || !job.IsActive)
-                throw new InvalidOperationException("המשרה אינה קיימת או אינה פתוחה להגשה.");
+                throw new InvalidOperationException("The job does not exist or is not open for applications.");
             if (job.Deadline.HasValue && job.Deadline.Value < DateTime.UtcNow)
-                throw new InvalidOperationException("תאריך הסגירה להגשת מועמדות למשרה זו עבר.");
+                throw new InvalidOperationException("The application deadline for this job has passed.");
 
             var application = _mapper.Map<Application>(dto);
             application.StudentId = studentId;
