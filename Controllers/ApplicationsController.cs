@@ -1,5 +1,6 @@
 using jobs_service_backend.BLL.Repositories.Services;
 using jobs_service_backend.BLL.Services;
+using jobs_service_backend.Data.Enums;
 using jobs_service_backend.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
