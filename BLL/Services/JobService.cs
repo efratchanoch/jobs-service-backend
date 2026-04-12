@@ -2,6 +2,7 @@ using AutoMapper;
 using jobs_service_backend.BLL.Repositories.Repositories;
 using jobs_service_backend.BLL.Repositories.Services;
 using jobs_service_backend.Data.Entities;
+using jobs_service_backend.Data.Enums;
 using jobs_service_backend.DTOs.Jobs;
 using jobs_service_backend.DTOs.Common;
 

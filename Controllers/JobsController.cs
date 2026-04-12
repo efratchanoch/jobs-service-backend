@@ -35,23 +35,6 @@ public async Task<IActionResult> Search([FromQuery] JobSearchFiltersDto filters)
     return Ok(result);
 }
 
-        [HttpGet]
-public async Task<IActionResult> GetAll(
-    [FromQuery] List<JobStatus>? statuses = null,
-    [FromQuery] int pageNumber = 1,
-    [FromQuery] int pageSize = 10)
-{
-    var result = await _jobService.GetAllPublicJobsAsync(statuses, pageNumber, pageSize);
-    return Ok(result);
-}
-
-[HttpGet("search")]
-public async Task<IActionResult> Search([FromQuery] JobSearchFiltersDto filters)
-{
-    var result = await _jobService.SearchJobsAsync(filters);
-    return Ok(result);
-}
-
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {

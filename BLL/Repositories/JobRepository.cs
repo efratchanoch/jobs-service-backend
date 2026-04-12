@@ -1,5 +1,6 @@
 using jobs_service_backend.Data;
 using jobs_service_backend.Data.Entities;
+using jobs_service_backend.Data.Enums;
 using jobs_service_backend.DTOs.Jobs;
 using Microsoft.EntityFrameworkCore;
 
