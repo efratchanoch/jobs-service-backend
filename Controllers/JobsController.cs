@@ -11,6 +11,7 @@ namespace jobs_service_backend.Controllers
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class JobsController : ControllerBase
     {
         private readonly IJobService _jobService;
@@ -24,6 +25,7 @@ namespace jobs_service_backend.Controllers
         /// Returns a paginated list of public jobs, optionally filtered by status and sort order.
         /// </summary>
         [HttpGet]
+        [Authorize(Roles = "Student,Manager")]
         public async Task<IActionResult> GetAll(
             [FromQuery] List<JobStatus>? statuses = null,
             [FromQuery] bool newestFirst = true,
@@ -38,6 +40,7 @@ namespace jobs_service_backend.Controllers
         /// Searches and filters jobs (tags, text, location, etc.) with pagination.
         /// </summary>
         [HttpGet("search")]
+        [Authorize(Roles = "Student,Manager")]
         public async Task<IActionResult> Search([FromQuery] JobSearchFiltersDto filters)
         {
             var result = await _jobService.SearchJobsAsync(filters);
@@ -48,6 +51,7 @@ namespace jobs_service_backend.Controllers
         /// Gets a single job by id.
         /// </summary>
         [HttpGet("{id}")]
+        [Authorize(Roles = "Student,Manager")]
         public async Task<IActionResult> GetById(int id)
         {
             var job = await _jobService.GetJobByIdAsync(id);

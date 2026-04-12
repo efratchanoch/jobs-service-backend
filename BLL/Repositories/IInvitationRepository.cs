@@ -28,8 +28,8 @@ namespace jobs_service_backend.BLL.Repositories.Repositories
         Task<(IEnumerable<PrivateJobInvitation> Invitations, int TotalCount)> GetMyNewInvitationsAsync(int studentId, int pageNumber, int pageSize);
 
         /// <summary>
-        /// Loads the invitation by primary key and sets <c>IsViewed</c> to true when found.
+        /// Loads the invitation by id for the given student and sets <c>IsViewed</c> to true when found.
         /// </summary>
-        Task MarkInvitationViewedAsync(int invitationId);
+        Task<bool> MarkInvitationViewedAsync(int invitationId, int studentId);
     }
 }

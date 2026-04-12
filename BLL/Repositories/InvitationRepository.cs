@@ -52,7 +52,6 @@ namespace jobs_service_backend.BLL.Repositories.Repositories
         /// <inheritdoc />
         public async Task<(IEnumerable<PrivateJobInvitation> Invitations, int TotalCount)> GetMyNewInvitationsAsync(int studentId, int pageNumber, int pageSize)
         {
-            // Closest job deadline first; invitations whose job has no deadline sort last; ties by newest invite.
             var query = _context.PrivateJobInvitations
                 .AsNoTracking()
                 .Include(i => i.Job)
@@ -71,14 +70,16 @@ namespace jobs_service_backend.BLL.Repositories.Repositories
         }
 
         /// <inheritdoc />
-        public async Task MarkInvitationViewedAsync(int invitationId)
+        public async Task<bool> MarkInvitationViewedAsync(int invitationId, int studentId)
         {
-            var invitation = await _context.PrivateJobInvitations.FindAsync(invitationId);
-            if (invitation != null)
-            {
-                invitation.IsViewed = true;
-                await _context.SaveChangesAsync();
-            }
+            var invitation = await _context.PrivateJobInvitations
+                .FirstOrDefaultAsync(i => i.InvitationId == invitationId && i.StudentId == studentId);
+            if (invitation == null)
+                return false;
+
+            invitation.IsViewed = true;
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }

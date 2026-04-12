@@ -32,6 +32,7 @@ namespace jobs_service_backend.Controllers
         /// <param name="statuses">Optional status filter; omit to include all.</param>
         /// <param name="newestFirst">When true, sorts by <c>AppliedAt</c> descending.</param>
         [HttpGet("my")]
+        [Authorize(Roles = "Student")]
         [ProducesResponseType(typeof(PaginatedListDto<StudentApplicationsListDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetMyApplications(
@@ -81,6 +82,7 @@ namespace jobs_service_backend.Controllers
         /// Submits an application to a job. The student id is taken from JWT claims, not from the request body.
         /// </summary>
         [HttpPost]
+        [Authorize(Roles = "Student")]
         [ProducesResponseType(typeof(StudentApplicationsListDto), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> ApplyToJob([FromBody] CreateApplicationDto dto)

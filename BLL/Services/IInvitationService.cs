@@ -35,9 +35,8 @@ namespace jobs_service_backend.BLL.Repositories.Services
         Task<PaginatedListDto<InvitationDto>> GetMyNewInvitationsAsync(int studentId, int pageNumber, int pageSize);
 
         /// <summary>
-        /// Sets <c>IsViewed</c> to true for the invitation if it exists.
+        /// Sets <c>IsViewed</c> to true for the invitation when it exists and belongs to the student.
         /// </summary>
-        /// <param name="invitationId">Primary key of the invitation row.</param>
-        Task MarkInvitationViewedAsync(int invitationId);
+        Task<bool> MarkInvitationViewedAsync(int invitationId, int studentId);
     }
 }

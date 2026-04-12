@@ -9,15 +9,18 @@ namespace jobs_service_backend.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[AllowAnonymous]
 public class TestAuthController : ControllerBase
 {
     private readonly IConfiguration _configuration;
+    private readonly IWebHostEnvironment _environment;
 
     // TODO: Remove this controller once the central Identity Service is integrated.
-    public TestAuthController(IConfiguration configuration)
+    // Token endpoint stays [AllowAnonymous] so developers can obtain a JWT without an existing token.
+    // In non-Development environments the endpoint returns 404 to avoid exposing a signing path in production.
+    public TestAuthController(IConfiguration configuration, IWebHostEnvironment environment)
     {
         _configuration = configuration;
+        _environment = environment;
     }
 
     public class TestAuthRequest
@@ -28,8 +31,12 @@ public class TestAuthController : ControllerBase
     }
 
     [HttpPost("token")]
+    [AllowAnonymous]
     public IActionResult GenerateToken([FromBody] TestAuthRequest request)
     {
+        if (!_environment.IsDevelopment())
+            return NotFound();
+
         var jwtSection = _configuration.GetSection("Jwt");
         var key = jwtSection["Key"];
         var issuer = jwtSection["Issuer"];

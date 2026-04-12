@@ -63,6 +63,7 @@ namespace jobs_service_backend.Controllers
         /// <response code="200">Paged list of invitations.</response>
         /// <response code="401">Missing or invalid JWT, or student id cannot be resolved from claims.</response>
         [HttpGet("my/all")]
+        [Authorize(Roles = "Student")]
         [ProducesResponseType(typeof(PaginatedListDto<InvitationDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> GetMyPrivateInvitations([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
@@ -87,6 +88,7 @@ namespace jobs_service_backend.Controllers
         /// <response code="200">Paged list of unviewed invitations.</response>
         /// <response code="401">Missing or invalid JWT, or student id cannot be resolved from claims.</response>
         [HttpGet("my/new")]
+        [Authorize(Roles = "Student")]
         [ProducesResponseType(typeof(PaginatedListDto<InvitationDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> GetMyNewPrivateInvitations([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
@@ -105,6 +107,7 @@ namespace jobs_service_backend.Controllers
         /// <response code="200">Paged list of invitations.</response>
         /// <response code="401">Missing or invalid JWT, or student id cannot be resolved from claims.</response>
         [HttpGet("my")]
+        [Authorize(Roles = "Student")]
         [ProducesResponseType(typeof(PaginatedListDto<InvitationDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public Task<IActionResult> GetMyInvitations([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
@@ -118,11 +121,16 @@ namespace jobs_service_backend.Controllers
         /// <response code="204">Update applied or invitation not found (no error body by design).</response>
         /// <response code="401">Missing or invalid authentication.</response>
         [HttpPatch("{id}/view")]
+        [Authorize(Roles = "Student")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> MarkInvitationViewed(int id)
         {
-            await _invitationService.MarkInvitationViewedAsync(id);
+            var studentId = _identityService.GetStudentId(User);
+            var updated = await _invitationService.MarkInvitationViewedAsync(id, studentId);
+            if (!updated)
+                return NotFound();
             return NoContent();
         }
     }
