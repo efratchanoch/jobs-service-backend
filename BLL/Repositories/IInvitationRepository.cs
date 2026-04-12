@@ -22,7 +22,8 @@ namespace jobs_service_backend.BLL.Repositories.Repositories
         Task<(IEnumerable<PrivateJobInvitation> Invitations, int TotalCount)> GetMyInvitationsAsync(int studentId, int pageNumber, int pageSize);
 
         /// <summary>
-        /// Same as <see cref="GetMyInvitationsAsync"/> but restricted to rows where <c>IsViewed == false</c> (student-facing "new" inbox).
+        /// Unviewed invitations only (<c>IsViewed == false</c>), ordered by the related job's <see cref="Job.Deadline"/> ascending (soonest first);
+        /// jobs without a deadline appear after those with a deadline; ties break by <see cref="PrivateJobInvitation.InvitedAt"/> descending.
         /// </summary>
         Task<(IEnumerable<PrivateJobInvitation> Invitations, int TotalCount)> GetMyNewInvitationsAsync(int studentId, int pageNumber, int pageSize);
 

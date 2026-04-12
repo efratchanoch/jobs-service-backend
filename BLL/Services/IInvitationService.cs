@@ -26,7 +26,7 @@ namespace jobs_service_backend.BLL.Repositories.Services
         Task<PaginatedListDto<InvitationDto>> GetMyInvitationsAsync(int studentId, int pageNumber, int pageSize);
 
         /// <summary>
-        /// Loads invitations that the student has not yet marked as viewed (<c>IsViewed == false</c>).
+        /// Loads unviewed invitations (<c>IsViewed == false</c>), sorted by related job deadline (soonest first; no deadline last), then by invite date.
         /// </summary>
         /// <param name="studentId">Resolved from the authenticated user.</param>
         /// <param name="pageNumber">1-based page.</param>

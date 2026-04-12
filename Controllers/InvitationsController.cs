@@ -73,7 +73,7 @@ namespace jobs_service_backend.Controllers
         }
 
         /// <summary>
-        /// Returns only <strong>new</strong> private invitations for the authenticated student (not yet marked as viewed), newest first, paginated.
+        /// Returns only <strong>new</strong> private invitations (unviewed), paginated, sorted by the related job's application deadline (soonest first).
         /// </summary>
         /// <param name="pageNumber">1-based page index (default 1).</param>
         /// <param name="pageSize">Page size (default 10).</param>
@@ -81,6 +81,7 @@ namespace jobs_service_backend.Controllers
         /// A <see cref="PaginatedListDto{T}"/> of <see cref="InvitationDto"/> where each item has <see cref="InvitationDto.IsViewedByStudent"/> <c>false</c>.
         /// </returns>
         /// <remarks>
+        /// Jobs without a deadline are listed after jobs with a deadline. Same-deadline ties use the most recent <c>InvitedAt</c> first.
         /// After the student opens an invitation in the UI, call <c>PATCH .../view</c> so it no longer appears in this list.
         /// </remarks>
         /// <response code="200">Paged list of unviewed invitations.</response>

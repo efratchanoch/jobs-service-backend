@@ -52,11 +52,14 @@ namespace jobs_service_backend.BLL.Repositories.Repositories
         /// <inheritdoc />
         public async Task<(IEnumerable<PrivateJobInvitation> Invitations, int TotalCount)> GetMyNewInvitationsAsync(int studentId, int pageNumber, int pageSize)
         {
+            // Closest job deadline first; invitations whose job has no deadline sort last; ties by newest invite.
             var query = _context.PrivateJobInvitations
                 .AsNoTracking()
                 .Include(i => i.Job)
                 .Where(i => i.StudentId == studentId && !i.IsViewed)
-                .OrderByDescending(i => i.InvitedAt);
+                .OrderBy(i => i.Job.Deadline == null ? 1 : 0)
+                .ThenBy(i => i.Job.Deadline)
+                .ThenByDescending(i => i.InvitedAt);
 
             var totalCount = await query.CountAsync();
             var invitations = await query
