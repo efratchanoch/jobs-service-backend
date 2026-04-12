@@ -6,6 +6,7 @@ namespace jobs_service_backend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class JobsController : ControllerBase
     {
         private readonly IJobService _jobService;
@@ -16,6 +17,7 @@ namespace jobs_service_backend.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Student,Manager")]
         public async Task<IActionResult> GetAll([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             var result = await _jobService.GetAllPublicJobsAsync(pageNumber, pageSize);
@@ -23,6 +25,7 @@ namespace jobs_service_backend.Controllers
         }
 
         [HttpGet("search")]
+        [Authorize(Roles = "Student,Manager")]
         public async Task<IActionResult> Search([FromQuery] JobSearchFiltersDto filters)
         {
             var result = await _jobService.SearchJobsAsync(filters);
@@ -30,6 +33,7 @@ namespace jobs_service_backend.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "Student,Manager")]
         public async Task<IActionResult> GetById(int id)
         {
             var job = await _jobService.GetJobByIdAsync(id);

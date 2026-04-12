@@ -6,6 +6,6 @@ namespace jobs_service_backend.BLL.Repositories.Repositories
     {
         Task SendInvitationsAsync(int jobId, List<int> studentIds);
         Task<IEnumerable<PrivateJobInvitation>> GetMyInvitationsAsync(int studentId);
-        Task MarkInvitationViewedAsync(int invitationId);
+        Task<bool> MarkInvitationViewedAsync(int invitationId, int studentId);
     }
 }

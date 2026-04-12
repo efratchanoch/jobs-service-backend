@@ -24,6 +24,7 @@ namespace jobs_service_backend.Controllers
         /// שליפת כל המועמדויות של התלמידה המחוברת (studentId מה-Claims).
         /// </summary>
         [HttpGet("my")]
+        [Authorize(Roles = "Student")]
         public async Task<IActionResult> GetMyApplications()
         {
             try
@@ -42,6 +43,7 @@ namespace jobs_service_backend.Controllers
         /// הגשת מועמדות למשרה (studentId מה-Claims, לא מה-body).
         /// </summary>
         [HttpPost]
+        [Authorize(Roles = "Student")]
         public async Task<IActionResult> ApplyToJob([FromBody] CreateApplicationDto dto)
         {
             try

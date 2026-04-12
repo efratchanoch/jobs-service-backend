@@ -33,6 +33,7 @@ namespace jobs_service_backend.Controllers
 
         // 2. שליפת ההזמנות שלי – לפי סטודנטית מתוך ה-JWT
         [HttpGet("my")]
+        [Authorize(Roles = "Student")]
         public async Task<IActionResult> GetMyInvitations()
         {
             var studentId = _identityService.GetStudentId(User);
@@ -42,9 +43,13 @@ namespace jobs_service_backend.Controllers
 
         // 3. סימון הזמנה כנצפתה
         [HttpPatch("{id}/view")]
+        [Authorize(Roles = "Student")]
         public async Task<IActionResult> MarkInvitationViewed(int id)
         {
-            await _invitationService.MarkInvitationViewedAsync(id);
+            var studentId = _identityService.GetStudentId(User);
+            var updated = await _invitationService.MarkInvitationViewedAsync(id, studentId);
+            if (!updated)
+                return NotFound();
             return NoContent();
         }
     }
