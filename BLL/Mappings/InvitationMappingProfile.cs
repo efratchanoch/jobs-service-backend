@@ -10,6 +10,8 @@ namespace jobs_service_backend.BLL.Repositories.Mappings
         {
             CreateMap<PrivateJobInvitation, InvitationDto>()
                 .ForMember(dest => dest.JobTitle, opt => opt.MapFrom(src => src.Job != null ? src.Job.Title : string.Empty))
+                .ForMember(dest => dest.JobImageUrl, opt => opt.MapFrom(src => src.Job != null ? src.Job.ImageUrl : null))
+                .ForMember(dest => dest.JobWebsiteUrl, opt => opt.MapFrom(src => src.Job != null ? src.Job.JobWebsiteUrl : null))
                 .ForMember(dest => dest.IsViewedByStudent, opt => opt.MapFrom(src => src.IsViewed));
 
             CreateMap<BulkInvitationDto, PrivateJobInvitation>()

@@ -39,7 +39,7 @@ public async Task<(IEnumerable<Job> Jobs, int TotalCount)> GetAllPublicJobsAsync
     return (jobs, totalCount);
 }
 
-public async Task<(IEnumerable<Job> Jobs, int TotalCount)> SearchJobsAsync(JobSearchFiltersDto filters)
+public async Task<(IEnumerable<Job> Jobs, int TotalCount)> SearchJobsAsync(JobSearchFiltersDto filters, int pageNumber, int pageSize)
 {
     var query = _context.Jobs
         .AsNoTracking()
@@ -70,8 +70,8 @@ public async Task<(IEnumerable<Job> Jobs, int TotalCount)> SearchJobsAsync(JobSe
 
     var totalCount = await query.CountAsync();
     var jobs = await query
-        .Skip((filters.PageNumber - 1) * filters.PageSize)
-        .Take(filters.PageSize)
+        .Skip((pageNumber - 1) * pageSize)
+        .Take(pageSize)
         .ToListAsync();
 
     return (jobs, totalCount);

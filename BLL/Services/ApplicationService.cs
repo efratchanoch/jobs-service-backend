@@ -22,16 +22,18 @@ namespace jobs_service_backend.BLL.Repositories.Services
 
         public async Task<PaginatedListDto<StudentApplicationsListDto>> GetMyApplicationsAsync(int studentId, List<ApplicationStatus>? statuses, bool newestFirst, int pageNumber, int pageSize)
 {
-    var (applications, totalCount) = await _repository.GetMyApplicationsAsync(studentId, statuses, newestFirst, pageNumber, pageSize);
+    var (pn, ps) = Pagination.Normalize(pageNumber, pageSize);
+    var (applications, totalCount) = await _repository.GetMyApplicationsAsync(studentId, statuses, newestFirst, pn, ps);
     var dtos = _mapper.Map<IEnumerable<StudentApplicationsListDto>>(applications);
-    return new PaginatedListDto<StudentApplicationsListDto>(dtos, totalCount, pageNumber, pageSize);
+    return new PaginatedListDto<StudentApplicationsListDto>(dtos, totalCount, pn, ps);
 }
 
 public async Task<PaginatedListDto<JobApplicationsListDto>> GetApplicationsForJobAsync(int jobId, List<ApplicationStatus>? statuses, bool newestFirst, int pageNumber, int pageSize)
 {
-    var (applications, totalCount) = await _repository.GetApplicationsForJobAsync(jobId, statuses, newestFirst, pageNumber, pageSize);
+    var (pn, ps) = Pagination.Normalize(pageNumber, pageSize);
+    var (applications, totalCount) = await _repository.GetApplicationsForJobAsync(jobId, statuses, newestFirst, pn, ps);
     var dtos = _mapper.Map<IEnumerable<JobApplicationsListDto>>(applications);
-    return new PaginatedListDto<JobApplicationsListDto>(dtos, totalCount, pageNumber, pageSize);
+    return new PaginatedListDto<JobApplicationsListDto>(dtos, totalCount, pn, ps);
 }
 
 

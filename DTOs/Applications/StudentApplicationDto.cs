@@ -12,10 +12,18 @@ public class StudentApplicationsListDto
 
     public string CompanyName { get; set; } = string.Empty;
 
+    public string? JobWebsiteUrl { get; set; }
+
+    public string? JobImageUrl { get; set; }
+
     public DateTime AppliedAt { get; set; }
 
     public ApplicationStatus Status { get; set; }
 
+    public DateTime? UpdatedAt { get; set; }
+
     public string? CoverLetter { get; set; }
+
+    public string? ResumeUrl { get; set; }
 }
 

@@ -30,17 +30,19 @@ namespace jobs_service_backend.BLL.Repositories.Services
         /// <inheritdoc />
         public async Task<PaginatedListDto<InvitationDto>> GetMyInvitationsAsync(int studentId, int pageNumber, int pageSize)
         {
-            var (invitations, totalCount) = await _repository.GetMyInvitationsAsync(studentId, pageNumber, pageSize);
+            var (pn, ps) = Pagination.Normalize(pageNumber, pageSize);
+            var (invitations, totalCount) = await _repository.GetMyInvitationsAsync(studentId, pn, ps);
             var dtos = _mapper.Map<IEnumerable<InvitationDto>>(invitations);
-            return new PaginatedListDto<InvitationDto>(dtos, totalCount, pageNumber, pageSize);
+            return new PaginatedListDto<InvitationDto>(dtos, totalCount, pn, ps);
         }
 
         /// <inheritdoc />
         public async Task<PaginatedListDto<InvitationDto>> GetMyNewInvitationsAsync(int studentId, int pageNumber, int pageSize)
         {
-            var (invitations, totalCount) = await _repository.GetMyNewInvitationsAsync(studentId, pageNumber, pageSize);
+            var (pn, ps) = Pagination.Normalize(pageNumber, pageSize);
+            var (invitations, totalCount) = await _repository.GetMyNewInvitationsAsync(studentId, pn, ps);
             var dtos = _mapper.Map<IEnumerable<InvitationDto>>(invitations);
-            return new PaginatedListDto<InvitationDto>(dtos, totalCount, pageNumber, pageSize);
+            return new PaginatedListDto<InvitationDto>(dtos, totalCount, pn, ps);
         }
 
         /// <inheritdoc />

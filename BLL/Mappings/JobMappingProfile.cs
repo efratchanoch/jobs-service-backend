@@ -12,14 +12,16 @@ namespace jobs_service_backend.BLL.Repositories.Mappings
                 .ForMember(dest => dest.JobType, opt => opt.MapFrom(src => src.JobType.ToString()))
                 .ForMember(dest => dest.Field, opt => opt.MapFrom(src => src.Field.ToString()))
                 .ForMember(dest => dest.JobWebsiteUrl, opt => opt.MapFrom(src => src.JobWebsiteUrl))
-                .ForMember(dest => dest.ImageUrl, opt => opt.MapFrom(src => src.ImageUrl))
+                .ForMember(dest => dest.JobImageUrl, opt => opt.MapFrom(src => src.ImageUrl))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
                 .ForMember(dest => dest.Tags, opt => opt.MapFrom(src => src.Tags.Select(t => t.TagName).ToList()));
 
             CreateMap<CreateJobDto, Job>()
+                .ForMember(dest => dest.ImageUrl, opt => opt.MapFrom(src => src.JobImageUrl))
                 .ForMember(dest => dest.Tags, opt => opt.Ignore());
 
             CreateMap<UpdateJobDto, Job>()
+                .ForMember(dest => dest.ImageUrl, opt => opt.MapFrom(src => src.JobImageUrl))
                 .ForMember(dest => dest.Tags, opt => opt.Ignore());
         }
     }
