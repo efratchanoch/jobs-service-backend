@@ -2,6 +2,7 @@ using AutoMapper;
 using jobs_service_backend.BLL.Repositories.Repositories;
 using jobs_service_backend.BLL.Repositories.Services;
 using jobs_service_backend.Data.Entities;
+using jobs_service_backend.Data.Enums;
 using jobs_service_backend.DTOs.Jobs;
 using jobs_service_backend.DTOs.Common;
 
@@ -17,20 +18,19 @@ namespace jobs_service_backend.BLL.Repositories.Services
             _repository = repository;
             _mapper = mapper;
         }
+public async Task<PaginatedListDto<JobDto>> GetAllPublicJobsAsync(List<JobStatus>? statuses, bool newestFirst, int pageNumber, int pageSize)
+{
+    var (jobs, totalCount) = await _repository.GetAllPublicJobsAsync(statuses, newestFirst, pageNumber, pageSize);
+    var dtos = _mapper.Map<IEnumerable<JobDto>>(jobs);
+    return new PaginatedListDto<JobDto>(dtos, totalCount, pageNumber, pageSize);
+}
 
-        public async Task<PaginatedListDto<JobDto>> GetAllPublicJobsAsync(int pageNumber, int pageSize)
-        {
-            var (jobs, totalCount) = await _repository.GetAllPublicJobsAsync(pageNumber, pageSize);
-            var dtos = _mapper.Map<IEnumerable<JobDto>>(jobs);
-            return new PaginatedListDto<JobDto>(dtos, totalCount, pageNumber, pageSize);
-        }
-
-        public async Task<PaginatedListDto<JobDto>> SearchJobsAsync(JobSearchFiltersDto filters)
-        {
-            var (jobs, totalCount) = await _repository.SearchJobsAsync(filters);
-            var dtos = _mapper.Map<IEnumerable<JobDto>>(jobs);
-            return new PaginatedListDto<JobDto>(dtos, totalCount, filters.PageNumber, filters.PageSize);
-        }
+public async Task<PaginatedListDto<JobDto>> SearchJobsAsync(JobSearchFiltersDto filters)
+{
+    var (jobs, totalCount) = await _repository.SearchJobsAsync(filters);
+    var dtos = _mapper.Map<IEnumerable<JobDto>>(jobs);
+    return new PaginatedListDto<JobDto>(dtos, totalCount, filters.PageNumber, filters.PageSize);
+}
 
         public async Task<JobDto?> GetJobByIdAsync(int id)
         {

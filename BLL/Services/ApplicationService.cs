@@ -1,7 +1,9 @@
 using AutoMapper;
 using jobs_service_backend.BLL.Repositories.Repositories;
 using jobs_service_backend.Data.Entities;
+using jobs_service_backend.Data.Enums;
 using jobs_service_backend.DTOs;
+using jobs_service_backend.DTOs.Common;
 
 namespace jobs_service_backend.BLL.Repositories.Services
 {
@@ -18,28 +20,32 @@ namespace jobs_service_backend.BLL.Repositories.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<StudentApplicationsListDto>> GetMyApplicationsAsync(int studentId)
-        {
-            var applications = await _repository.GetMyApplicationsAsync(studentId);
-            return _mapper.Map<IEnumerable<StudentApplicationsListDto>>(applications);
-        }
+        public async Task<PaginatedListDto<StudentApplicationsListDto>> GetMyApplicationsAsync(int studentId, List<ApplicationStatus>? statuses, bool newestFirst, int pageNumber, int pageSize)
+{
+    var (applications, totalCount) = await _repository.GetMyApplicationsAsync(studentId, statuses, newestFirst, pageNumber, pageSize);
+    var dtos = _mapper.Map<IEnumerable<StudentApplicationsListDto>>(applications);
+    return new PaginatedListDto<StudentApplicationsListDto>(dtos, totalCount, pageNumber, pageSize);
+}
 
-        public async Task<IEnumerable<JobApplicationsListDto>> GetApplicationsForJobAsync(int jobId)
-        {
-            var applications = await _repository.GetApplicationsForJobAsync(jobId);
-            return _mapper.Map<IEnumerable<JobApplicationsListDto>>(applications);
-        }
+public async Task<PaginatedListDto<JobApplicationsListDto>> GetApplicationsForJobAsync(int jobId, List<ApplicationStatus>? statuses, bool newestFirst, int pageNumber, int pageSize)
+{
+    var (applications, totalCount) = await _repository.GetApplicationsForJobAsync(jobId, statuses, newestFirst, pageNumber, pageSize);
+    var dtos = _mapper.Map<IEnumerable<JobApplicationsListDto>>(applications);
+    return new PaginatedListDto<JobApplicationsListDto>(dtos, totalCount, pageNumber, pageSize);
+}
+
+
 
         public async Task<StudentApplicationsListDto> ApplyToJobAsync(CreateApplicationDto dto, int studentId)
         {
             if (await _repository.IsAlreadyAppliedAsync(studentId, dto.JobId))
-                throw new InvalidOperationException("התלמידה כבר הגישה מועמדות למשרה זו.");
+                throw new InvalidOperationException("You have already applied to this job.");
 
             var job = await _jobRepository.GetJobByIdAsync(dto.JobId);
             if (job == null || !job.IsActive)
-                throw new InvalidOperationException("המשרה אינה קיימת או אינה פתוחה להגשה.");
+                throw new InvalidOperationException("The job does not exist or is not open for applications.");
             if (job.Deadline.HasValue && job.Deadline.Value < DateTime.UtcNow)
-                throw new InvalidOperationException("תאריך הסגירה להגשת מועמדות למשרה זו עבר.");
+                throw new InvalidOperationException("The application deadline for this job has passed.");
 
             var application = _mapper.Map<Application>(dto);
             application.StudentId = studentId;

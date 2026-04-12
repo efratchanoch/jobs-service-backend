@@ -21,25 +21,52 @@ namespace jobs_service_backend.BLL.Repositories.Repositories
                 .AnyAsync(a => a.StudentId == studentId && a.JobId == jobId);
         }
 
-        public async Task<IEnumerable<Application>> GetMyApplicationsAsync(int studentId)
-        {
-            return await _context.Applications
-                .AsNoTracking()
-                .Include(a => a.Job)
-                .Where(a => a.StudentId == studentId)
-                .OrderByDescending(a => a.AppliedAt)
-                .ToListAsync();
-        }
+        public async Task<(IEnumerable<Application> Applications, int TotalCount)> GetMyApplicationsAsync(int studentId, List<ApplicationStatus>? statuses, bool newestFirst, int pageNumber, int pageSize)
+{
+    var query = _context.Applications
+        .AsNoTracking()
+        .Include(a => a.Job)
+        .Where(a => a.StudentId == studentId);
 
-        public async Task<IEnumerable<Application>> GetApplicationsForJobAsync(int jobId)
-        {
-            return await _context.Applications
-                .AsNoTracking()
-                .Include(a => a.Job)
-                .Where(a => a.JobId == jobId)
-                .OrderByDescending(a => a.UpdatedAt ?? a.AppliedAt)
-                .ToListAsync();
-        }
+    if (statuses != null && statuses.Count > 0)
+        query = query.Where(a => statuses.Contains(a.Status));
+
+    query = newestFirst
+        ? query.OrderByDescending(a => a.AppliedAt)
+        : query.OrderBy(a => a.AppliedAt);
+
+    var totalCount = await query.CountAsync();
+    var applications = await query
+        .Skip((pageNumber - 1) * pageSize)
+        .Take(pageSize)
+        .ToListAsync();
+
+    return (applications, totalCount);
+}
+
+public async Task<(IEnumerable<Application> Applications, int TotalCount)> GetApplicationsForJobAsync(int jobId, List<ApplicationStatus>? statuses, bool newestFirst, int pageNumber, int pageSize)
+{
+    var query = _context.Applications
+        .AsNoTracking()
+        .Include(a => a.Job)
+        .Where(a => a.JobId == jobId);
+
+    if (statuses != null && statuses.Count > 0)
+        query = query.Where(a => statuses.Contains(a.Status));
+
+    query = newestFirst
+        ? query.OrderByDescending(a => a.UpdatedAt ?? a.AppliedAt)
+        : query.OrderBy(a => a.UpdatedAt ?? a.AppliedAt);
+
+    var totalCount = await query.CountAsync();
+    var applications = await query
+        .Skip((pageNumber - 1) * pageSize)
+        .Take(pageSize)
+        .ToListAsync();
+
+    return (applications, totalCount);
+}
+
 
         public async Task<Application> ApplyToJobAsync(Application application)
         {
