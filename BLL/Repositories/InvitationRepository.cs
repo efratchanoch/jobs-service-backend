@@ -56,7 +56,9 @@ namespace jobs_service_backend.BLL.Repositories.Repositories
                 .AsNoTracking()
                 .Include(i => i.Job)
                 .Where(i => i.StudentId == studentId && !i.IsViewed)
-                .OrderByDescending(i => i.InvitedAt);
+                .OrderBy(i => i.Job.Deadline == null ? 1 : 0)
+                .ThenBy(i => i.Job.Deadline)
+                .ThenByDescending(i => i.InvitedAt);
 
             var totalCount = await query.CountAsync();
             var invitations = await query
@@ -68,14 +70,16 @@ namespace jobs_service_backend.BLL.Repositories.Repositories
         }
 
         /// <inheritdoc />
-        public async Task MarkInvitationViewedAsync(int invitationId)
+        public async Task<bool> MarkInvitationViewedAsync(int invitationId, int studentId)
         {
-            var invitation = await _context.PrivateJobInvitations.FindAsync(invitationId);
-            if (invitation != null)
-            {
-                invitation.IsViewed = true;
-                await _context.SaveChangesAsync();
-            }
+            var invitation = await _context.PrivateJobInvitations
+                .FirstOrDefaultAsync(i => i.InvitationId == invitationId && i.StudentId == studentId);
+            if (invitation == null)
+                return false;
+
+            invitation.IsViewed = true;
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }

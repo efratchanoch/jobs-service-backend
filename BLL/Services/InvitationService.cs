@@ -46,9 +46,7 @@ namespace jobs_service_backend.BLL.Repositories.Services
         }
 
         /// <inheritdoc />
-        public async Task MarkInvitationViewedAsync(int invitationId)
-        {
-            await _repository.MarkInvitationViewedAsync(invitationId);
-        }
+        public Task<bool> MarkInvitationViewedAsync(int invitationId, int studentId) =>
+            _repository.MarkInvitationViewedAsync(invitationId, studentId);
     }
 }
