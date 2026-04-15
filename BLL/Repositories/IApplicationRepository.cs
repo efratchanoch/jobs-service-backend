@@ -13,5 +13,8 @@ namespace jobs_service_backend.BLL.Repositories.Repositories
         Task<Application> ApplyToJobAsync(Application application);
         Task<bool> UpdateApplicationStatusAsync(UpdateApplicationStatusDto dto);
         Task<bool> UpdateNotesAsync(int applicationId, string? notes);
+
+        Task<bool> ManagerCanAccessResumeFileAsync(string fileName);
+        Task<bool> StudentOwnsResumeFileAsync(string fileName, int studentId);
     }
 }

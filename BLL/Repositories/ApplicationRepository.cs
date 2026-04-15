@@ -3,6 +3,7 @@ using jobs_service_backend.Data.Entities;
 using jobs_service_backend.Data.Enums;
 using jobs_service_backend.DTOs;
 using Microsoft.EntityFrameworkCore;
+using System.IO;
 
 namespace jobs_service_backend.BLL.Repositories.Repositories
 {
@@ -74,6 +75,7 @@ public async Task<(IEnumerable<Application> Applications, int TotalCount)> GetAp
             application.Status = ApplicationStatus.Pending;
             _context.Applications.Add(application);
             await _context.SaveChangesAsync();
+            await _context.Entry(application).Reference(a => a.Job).LoadAsync();
             return application;
         }
 
@@ -100,6 +102,29 @@ public async Task<(IEnumerable<Application> Applications, int TotalCount)> GetAp
             application.UpdatedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<bool> ManagerCanAccessResumeFileAsync(string fileName)
+        {
+            fileName = Path.GetFileName(fileName);
+            if (string.IsNullOrEmpty(fileName)) return false;
+
+            return await _context.Applications
+                .AsNoTracking()
+                .AnyAsync(a => a.ResumeUrl != null && a.ResumeUrl.EndsWith("/" + fileName));
+        }
+
+        public async Task<bool> StudentOwnsResumeFileAsync(string fileName, int studentId)
+        {
+            fileName = Path.GetFileName(fileName);
+            if (string.IsNullOrEmpty(fileName)) return false;
+
+            return await _context.Applications
+                .AsNoTracking()
+                .AnyAsync(a =>
+                    a.StudentId == studentId
+                    && a.ResumeUrl != null
+                    && a.ResumeUrl.EndsWith("/" + fileName));
         }
     }
 }

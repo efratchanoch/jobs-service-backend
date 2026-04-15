@@ -33,6 +33,7 @@ builder.Services.AddScoped<IInvitationService, InvitationService>();
 builder.Services.AddScoped<ITagService, TagService>();
 
 builder.Services.AddScoped<IIdentityService, IdentityService>();
+builder.Services.AddScoped<IFileStorageService, FileStorageService>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
@@ -115,6 +116,8 @@ if (app.Environment.IsDevelopment())
 
 
 //app.UseHttpsRedirection();
+app.UseStaticFiles();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 

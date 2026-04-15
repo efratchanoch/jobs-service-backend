@@ -291,5 +291,9 @@ coverage*.info
 dist/
 out/
 
+# Uploaded files (job images, resumes)
+wwwroot/uploads/
+private-uploads/
+
 # Configuration files (containing local DB connections and secrets)
 appsettings.json

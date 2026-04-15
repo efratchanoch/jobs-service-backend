@@ -18,6 +18,12 @@ namespace jobs_service_backend.DTOs.Invitations
         /// <summary>Display title from the related job.</summary>
         public string JobTitle { get; set; } = string.Empty;
 
+        /// <summary>Optional image URL for the job listing (from the related job record).</summary>
+        public string? JobImageUrl { get; set; }
+
+        /// <summary>Optional company/job website URL (from related <c>Job.JobWebsiteUrl</c>).</summary>
+        public string? JobWebsiteUrl { get; set; }
+
         /// <summary>UTC timestamp when the invitation was created.</summary>
         public DateTime InvitedAt { get; set; }
 

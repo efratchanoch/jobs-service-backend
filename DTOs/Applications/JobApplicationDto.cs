@@ -19,5 +19,11 @@ public class JobApplicationsListDto
     public string? CoverLetter { get; set; }
 
     public string? Notes { get; set; }
+
+    public string? ResumeUrl { get; set; }
+
+    public string? JobWebsiteUrl { get; set; }
+
+    public string? JobImageUrl { get; set; }
 }
 

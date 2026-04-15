@@ -19,10 +19,14 @@ namespace jobs_service_backend.BLL.Repositories.Mappings
         {
             CreateMap<Application, StudentApplicationsListDto>()
                 .ForMember(dest => dest.JobTitle, opt => opt.MapFrom(src => src.Job != null ? src.Job.Title : string.Empty))
-                .ForMember(dest => dest.CompanyName, opt => opt.MapFrom(src => src.Job != null ? src.Job.CompanyName : string.Empty));
+                .ForMember(dest => dest.CompanyName, opt => opt.MapFrom(src => src.Job != null ? src.Job.CompanyName : string.Empty))
+                .ForMember(dest => dest.JobWebsiteUrl, opt => opt.MapFrom(src => src.Job != null ? src.Job.JobWebsiteUrl : null))
+                .ForMember(dest => dest.JobImageUrl, opt => opt.MapFrom(src => src.Job != null ? src.Job.ImageUrl : null));
 
             CreateMap<Application, JobApplicationsListDto>()
-                .ForMember(dest => dest.StudentName, opt => opt.Ignore());
+                .ForMember(dest => dest.StudentName, opt => opt.Ignore()) // אין ישות Student – למלא ממקור חיצוני אם נדרש
+                .ForMember(dest => dest.JobWebsiteUrl, opt => opt.MapFrom(src => src.Job != null ? src.Job.JobWebsiteUrl : null))
+                .ForMember(dest => dest.JobImageUrl, opt => opt.MapFrom(src => src.Job != null ? src.Job.ImageUrl : null));
 
             CreateMap<CreateApplicationDto, Application>()
                 .ForMember(dest => dest.ApplicationId, opt => opt.Ignore())
