@@ -99,21 +99,6 @@ namespace jobs_service_backend.Controllers
         }
 
         /// <summary>
-        /// Legacy alias for <see cref="GetMyPrivateInvitations"/>: returns all private invitations for the authenticated student.
-        /// </summary>
-        /// <param name="pageNumber">1-based page index (default 1).</param>
-        /// <param name="pageSize">Page size (default 10).</param>
-        /// <returns>Same as <see cref="GetMyPrivateInvitations"/>.</returns>
-        /// <response code="200">Paged list of invitations.</response>
-        /// <response code="401">Missing or invalid JWT, or student id cannot be resolved from claims.</response>
-        [HttpGet("my")]
-        [Authorize(Roles = "Student")]
-        [ProducesResponseType(typeof(PaginatedListDto<InvitationDto>), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public Task<IActionResult> GetMyInvitations([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
-            => GetMyPrivateInvitations(pageNumber, pageSize);
-
-        /// <summary>
         /// Marks a single invitation as viewed by the student (idempotent for already-viewed rows).
         /// </summary>
         /// <param name="id">Invitation primary key (<c>InvitationId</c>).</param>

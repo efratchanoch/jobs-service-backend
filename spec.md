@@ -73,7 +73,7 @@ Invitations from managers to specific students for private jobs.
 |------|------------------|------|
 | Jobs | `GET /api/jobs`, `GET /api/jobs/search`, `GET /api/jobs/{id}`, `POST/PUT/DELETE` (manager) | Mixed |
 | Applications | `GET /api/applications/my`, `POST /api/applications`, `GET /api/applications/job/{jobId}` (manager), status/notes updates (manager) | JWT; manager where noted |
-| Invitations | `POST /api/invitations/bulk` (manager), `GET .../my`, `my/all`, `my/new`, `PATCH .../view` | JWT |
+| Invitations | `POST /api/invitations/bulk` (manager), `GET .../my/all`, `GET .../my/new`, `PATCH .../view` | JWT |
 | Tags | `GET /api/tags` (public), create/delete (manager) | Mixed |
 | Health | `GET /api/health` | Anonymous |
 
