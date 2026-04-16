@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using jobs_service_backend.BLL.Repositories.Repositories; 
 using jobs_service_backend.BLL.Repositories.Services;     
 using jobs_service_backend.BLL.Services;
+using jobs_service_backend.Clients;
 using FluentValidation.AspNetCore;
 using FluentValidation;
 using jobs_service_backend.BLL.Validators;
@@ -34,6 +35,17 @@ builder.Services.AddScoped<ITagService, TagService>();
 
 builder.Services.AddScoped<IIdentityService, IdentityService>();
 builder.Services.AddScoped<IFileStorageService, FileStorageService>();
+
+// רישום ה-HttpClient עבור המיקרוסרביס של פרופיל התלמידות.
+// ה-BaseUrl נלקח מה-appsettings תחת המפתח "StudentService:BaseUrl".
+var studentServiceBaseUrl = builder.Configuration["StudentService:BaseUrl"]
+                            ?? "http://localhost:5250";
+
+builder.Services.AddHttpClient<IStudentClient, StudentClient>(client =>
+{
+    client.BaseAddress = new Uri(studentServiceBaseUrl);
+    client.Timeout = TimeSpan.FromSeconds(30);
+});
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 

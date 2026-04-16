@@ -1,3 +1,4 @@
+using jobs_service_backend.Clients;
 using jobs_service_backend.Data.Enums;
 
 namespace jobs_service_backend.DTOs;
@@ -6,9 +7,11 @@ public class JobApplicationsListDto
 {
     public int ApplicationId { get; set; }
 
-    public int StudentId { get; set; }
-
-    public string StudentName { get; set; } = string.Empty;
+    /// <summary>
+    /// Full student profile fetched from the student_profile microservice.
+    /// Null if the student profile could not be retrieved.
+    /// </summary>
+    public StudentProfileDto? Student { get; set; }
 
     public DateTime AppliedAt { get; set; }
 

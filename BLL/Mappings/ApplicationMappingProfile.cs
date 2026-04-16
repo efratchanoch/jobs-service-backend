@@ -9,7 +9,7 @@ namespace jobs_service_backend.BLL.Repositories.Mappings
     /// </summary>
     /// <remarks>
     /// StudentApplicationsListDto: job title and company from <see cref="Application.Job"/>.
-    /// JobApplicationsListDto: <see cref="JobApplicationsListDto.StudentName"/> is ignored until a student source exists.
+    /// JobApplicationsListDto: <see cref="JobApplicationsListDto.Student"/> is populated from the student_profile microservice in the service layer.
     /// CreateApplicationDto: identity and timestamps are assigned in the service/repository.
     /// UpdateApplicationStatusDto: maps status and notes only for manager updates.
     /// </remarks>
@@ -24,7 +24,7 @@ namespace jobs_service_backend.BLL.Repositories.Mappings
                 .ForMember(dest => dest.JobImageUrl, opt => opt.MapFrom(src => src.Job != null ? src.Job.ImageUrl : null));
 
             CreateMap<Application, JobApplicationsListDto>()
-                .ForMember(dest => dest.StudentName, opt => opt.Ignore()) // אין ישות Student – למלא ממקור חיצוני אם נדרש
+                .ForMember(dest => dest.Student, opt => opt.Ignore()) // Populated from the student_profile microservice in the service layer
                 .ForMember(dest => dest.JobWebsiteUrl, opt => opt.MapFrom(src => src.Job != null ? src.Job.JobWebsiteUrl : null))
                 .ForMember(dest => dest.JobImageUrl, opt => opt.MapFrom(src => src.Job != null ? src.Job.ImageUrl : null));
 

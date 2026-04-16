@@ -1,5 +1,6 @@
 using AutoMapper;
 using jobs_service_backend.BLL.Repositories.Repositories;
+using jobs_service_backend.Clients;
 using jobs_service_backend.Data.Entities;
 using jobs_service_backend.Data.Enums;
 using jobs_service_backend.DTOs;
@@ -11,12 +12,18 @@ namespace jobs_service_backend.BLL.Repositories.Services
     {
         private readonly IApplicationRepository _repository;
         private readonly IJobRepository _jobRepository;
+        private readonly IStudentClient _studentClient;
         private readonly IMapper _mapper;
 
-        public ApplicationService(IApplicationRepository repository, IJobRepository jobRepository, IMapper mapper)
+        public ApplicationService(
+            IApplicationRepository repository,
+            IJobRepository jobRepository,
+            IStudentClient studentClient,
+            IMapper mapper)
         {
             _repository = repository;
             _jobRepository = jobRepository;
+            _studentClient = studentClient;
             _mapper = mapper;
         }
 
@@ -32,8 +39,46 @@ public async Task<PaginatedListDto<JobApplicationsListDto>> GetApplicationsForJo
 {
     var (pn, ps) = Pagination.Normalize(pageNumber, pageSize);
     var (applications, totalCount) = await _repository.GetApplicationsForJobAsync(jobId, statuses, newestFirst, pn, ps);
-    var dtos = _mapper.Map<IEnumerable<JobApplicationsListDto>>(applications);
+
+    var applicationList = applications.ToList();
+    var dtos = _mapper.Map<List<JobApplicationsListDto>>(applicationList);
+
+    // Enrich each application with the full student profile fetched from the student_profile microservice.
+    // Profiles are cached per StudentId to avoid duplicate HTTP calls within the same page.
+    var profileCache = new Dictionary<int, StudentProfileDto?>();
+    for (var i = 0; i < applicationList.Count; i++)
+    {
+        var studentId = applicationList[i].StudentId;
+        if (!profileCache.TryGetValue(studentId, out var profile))
+        {
+            profile = await TryGetStudentProfileAsync(studentId);
+            profileCache[studentId] = profile;
+        }
+
+        dtos[i].Student = profile;
+    }
+
     return new PaginatedListDto<JobApplicationsListDto>(dtos, totalCount, pn, ps);
+}
+
+private async Task<StudentProfileDto?> TryGetStudentProfileAsync(int studentId)
+{
+    // The Application entity stores StudentId as int, while the student_profile microservice
+    // identifies students by Guid. Convert deterministically by embedding the int into the
+    // first 4 bytes of an empty Guid. Replace this shim once both services use a unified id type.
+    var guidBytes = new byte[16];
+    BitConverter.GetBytes(studentId).CopyTo(guidBytes, 0);
+    var studentGuid = new Guid(guidBytes);
+
+    try
+    {
+        return await _studentClient.GetStudentByIdAsync(studentGuid);
+    }
+    catch (HttpRequestException)
+    {
+        // Profile microservice unavailable – return null and let callers handle the missing profile.
+        return null;
+    }
 }
 
 
