@@ -1,0 +1,15 @@
+---
+description: Git push target policy for jobs-service-backend
+alwaysApply: true
+---
+
+# Git Push Target (Backend Repo)
+
+- Repository: `jobs-service-backend`
+- Default working branch: `main`
+- Default push target: `origin main`
+
+## Commit/Push Guidance
+
+- Push backend commits to `main` in this repository, unless the user explicitly requests a different branch.
+- Keep backend commits scoped to backend files only.
