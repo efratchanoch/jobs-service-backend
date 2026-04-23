@@ -69,5 +69,20 @@ public class TestAuthController : ControllerBase
         var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
         return Ok(new { token = tokenString });
     }
+
+    [HttpGet("manager-token")]
+    [AllowAnonymous]
+    public IActionResult GenerateManagerToken()
+    {
+        if (!_environment.IsDevelopment())
+            return NotFound();
+
+        return GenerateToken(new TestAuthRequest
+        {
+            StudentId = 999001,
+            Username = "dev-manager",
+            Role = "Manager"
+        });
+    }
 }
 
