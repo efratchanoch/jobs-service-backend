@@ -42,6 +42,7 @@ builder.Services.AddScoped<IJobService, JobService>();
 builder.Services.AddScoped<IApplicationService, ApplicationService>();
 builder.Services.AddScoped<IInvitationService, InvitationService>();
 builder.Services.AddScoped<ITagService, TagService>();
+builder.Services.AddScoped<IAdminStatsService, AdminStatsService>();
 
 builder.Services.AddScoped<IIdentityService, IdentityService>();
 builder.Services.AddScoped<IFileStorageService, FileStorageService>();
@@ -132,7 +133,10 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-
+    using var seedScope = app.Services.CreateScope();
+    var dbContext = seedScope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var seedLogger = seedScope.ServiceProvider.GetRequiredService<ILoggerFactory>().CreateLogger("DevelopmentDataSeeder");
+    await DevelopmentDataSeeder.SeedIfNeededAsync(dbContext, seedLogger);
 }
 
 
