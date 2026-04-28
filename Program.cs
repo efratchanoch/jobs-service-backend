@@ -20,10 +20,33 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("FrontendDevCors", policy =>
     {
-        policy
-            .WithOrigins("http://localhost:5173", "http://localhost:5174")
-            .AllowAnyHeader()
-            .AllowAnyMethod();
+        if (builder.Environment.IsDevelopment())
+        {
+            // Allow any Vite/Preview port on localhost without maintaining a static port list
+            policy
+                .SetIsOriginAllowed(static origin =>
+                {
+                    if (string.IsNullOrEmpty(origin)) return false;
+                    try
+                    {
+                        var uri = new Uri(origin);
+                        return uri.Host is "localhost" or "127.0.0.1";
+                    }
+                    catch
+                    {
+                        return false;
+                    }
+                })
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        }
+        else
+        {
+            policy
+                .WithOrigins("http://localhost:5173", "http://localhost:5174", "http://127.0.0.1:5173", "http://127.0.0.1:5174")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        }
     });
 });
 
@@ -47,8 +70,7 @@ builder.Services.AddScoped<IAdminStatsService, AdminStatsService>();
 builder.Services.AddScoped<IIdentityService, IdentityService>();
 builder.Services.AddScoped<IFileStorageService, FileStorageService>();
 
-// רישום ה-HttpClient עבור המיקרוסרביס של פרופיל התלמידות.
-// ה-BaseUrl נלקח מה-appsettings תחת המפתח "StudentService:BaseUrl".
+// HttpClient for the student-profile microservice. BaseUrl from appsettings: StudentService:BaseUrl.
 var studentServiceBaseUrl = builder.Configuration["StudentService:BaseUrl"]
                             ?? "http://localhost:5250";
 

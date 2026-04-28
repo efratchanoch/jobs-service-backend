@@ -31,10 +31,26 @@ namespace jobs_service_backend.BLL.Validators
                 .GreaterThanOrEqualTo(0)
                 .WithMessage("Experience must be a non-negative integer.");
 
-            RuleFor(x => x.Deadline)
-                .GreaterThan(DateTime.UtcNow)
-                .When(x => x.Deadline.HasValue)
-                .WithMessage("Deadline must be in the future.");
+            RuleFor(x => x.CompanyName)
+                .NotEmpty().WithMessage("Company name is required.");
+
+            RuleFor(x => x.Location)
+                .NotEmpty().WithMessage("Location is required.");
+
+            RuleFor(x => x.SalaryMin)
+                .GreaterThanOrEqualTo(0)
+                .When(x => x.SalaryMin.HasValue)
+                .WithMessage("Minimum salary cannot be negative.");
+
+            RuleFor(x => x.SalaryMax)
+                .GreaterThanOrEqualTo(0)
+                .When(x => x.SalaryMax.HasValue)
+                .WithMessage("Maximum salary cannot be negative.");
+
+            RuleFor(x => x.SalaryMax)
+                .GreaterThan(x => x.SalaryMin)
+                .When(x => x.SalaryMin.HasValue && x.SalaryMax.HasValue)
+                .WithMessage("Maximum salary must be greater than minimum salary.");
         }
     }
 }
